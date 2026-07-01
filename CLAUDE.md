@@ -1,4 +1,4 @@
-# Fumadocs Personal Documentation
+# Fuma Lab Documentation
 
 ## Background
 

@@ -4,6 +4,10 @@ import './global.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL ?? 'http://localhost:3000'),
+  title: {
+    default: 'Fuma Lab',
+    template: '%s | Fuma Lab',
+  },
 };
 
 export default function Layout({ children }: LayoutProps<'/'>) {

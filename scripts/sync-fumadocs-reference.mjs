@@ -316,7 +316,7 @@ async function fetchPage(page, fetchedAt) {
   const response = await fetch(url, {
     headers: {
       Accept: 'text/markdown',
-      'User-Agent': 'fumadocs-personal-reference-sync/1.0',
+      'User-Agent': 'fuma-lab-reference-sync/1.0',
     },
     redirect: 'error',
   });
@@ -336,7 +336,7 @@ async function discoverUpstreamCommit() {
     {
       headers: {
         Accept: 'application/vnd.github+json',
-        'User-Agent': 'fumadocs-personal-reference-sync/1.0',
+        'User-Agent': 'fuma-lab-reference-sync/1.0',
       },
     },
   );

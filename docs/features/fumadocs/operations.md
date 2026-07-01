@@ -1,4 +1,4 @@
-# Fumadocs Personal 运行手册
+# Fuma Lab 运行手册
 
 本文面向维护和运行当前仓库的操作人员，覆盖部署、检查、内容更新、回滚、
 备份、升级和故障处理。所有命令默认在仓库根目录执行。
@@ -8,7 +8,7 @@
 | 项目 | 当前值 |
 | --- | --- |
 | Compose 服务 | `docs` |
-| 本地镜像 | `fumadocs-personal:local` |
+| 本地镜像 | `fuma-lab:local` |
 | 应用入口 | `/docs` |
 | 容器端口 | `3000` |
 | 默认宿主机地址 | `127.0.0.1:3000` |
@@ -218,12 +218,12 @@ git restore --source=HEAD -- content/docs/fumadocs third_party/fumadocs/snapshot
 
 ### 7.1 发布前保存当前镜像
 
-`fumadocs-personal:local` 是可变标签。重建前为当前可用镜像创建唯一回滚标签：
+`fuma-lab:local` 是可变标签。重建前为当前可用镜像创建唯一回滚标签：
 
 ```bash
-ROLLBACK_TAG="fumadocs-personal:rollback-$(date +%Y%m%d-%H%M%S)"
-docker image inspect fumadocs-personal:local >/dev/null
-docker tag fumadocs-personal:local "$ROLLBACK_TAG"
+ROLLBACK_TAG="fuma-lab:rollback-$(date +%Y%m%d-%H%M%S)"
+docker image inspect fuma-lab:local >/dev/null
+docker tag fuma-lab:local "$ROLLBACK_TAG"
 printf '%s\n' "$ROLLBACK_TAG"
 ```
 
@@ -255,7 +255,7 @@ curl -fsS 'http://127.0.0.1:3000/api/search?query=Layout'
 新容器异常时，将已记录的回滚标签重新指向 Compose 使用的标签：
 
 ```bash
-docker tag fumadocs-personal:rollback-YYYYMMDD-HHMMSS fumadocs-personal:local
+docker tag fuma-lab:rollback-YYYYMMDD-HHMMSS fuma-lab:local
 docker compose up -d --no-build --force-recreate
 docker compose ps
 curl -fsS http://127.0.0.1:3000/docs >/dev/null
@@ -290,8 +290,8 @@ git bundle verify "$BACKUP"
 可选地导出当前镜像：
 
 ```bash
-docker save fumadocs-personal:local \
-  | gzip > ../fumadocs-personal-image-$(date +%Y%m%d).tar.gz
+docker save fuma-lab:local \
+  | gzip > ../fuma-lab-image-$(date +%Y%m%d).tar.gz
 ```
 
 ### 8.2 从源码恢复
@@ -315,7 +315,7 @@ docker compose up -d --no-build
 从镜像归档临时恢复：
 
 ```bash
-gzip -dc fumadocs-personal-image-YYYYMMDD.tar.gz | docker load
+gzip -dc fuma-lab-image-YYYYMMDD.tar.gz | docker load
 docker compose up -d --no-build
 ```
 
@@ -404,14 +404,14 @@ curl -v http://127.0.0.1:3000/docs
 
 ```bash
 docker compose ps
-docker image ls 'fumadocs-personal'
+docker image ls 'fuma-lab'
 docker system df
 ```
 
 删除已确认不再需要的单个回滚镜像：
 
 ```bash
-docker image rm fumadocs-personal:rollback-YYYYMMDD-HHMMSS
+docker image rm fuma-lab:rollback-YYYYMMDD-HHMMSS
 ```
 
 清理未使用的构建缓存：

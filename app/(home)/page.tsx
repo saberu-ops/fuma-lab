@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <div className="flex flex-col justify-center text-center flex-1">
-      <h1 className="text-2xl font-bold mb-4">个人文档</h1>
+      <h1 className="text-2xl font-bold mb-4">Fuma Lab</h1>
       <p>
         前往{' '}
         <Link href="/docs" className="font-medium underline">

@@ -1,4 +1,4 @@
-# Fumadocs Personal
+# Fuma Lab
 
 基于 Next.js 和 Fumadocs 的个人文档站点，默认以不可变 Docker 镜像运行。
 项目同时包含个人中文文档和一组可离线使用的 Fumadocs 官方英文文档快照。

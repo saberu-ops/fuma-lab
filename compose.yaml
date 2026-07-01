@@ -1,6 +1,6 @@
 services:
   docs:
-    image: fumadocs-personal:local
+    image: fuma-lab:local
     build:
       context: .
       args:
