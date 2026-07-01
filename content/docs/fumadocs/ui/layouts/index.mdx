@@ -1,0 +1,95 @@
+---
+title: "Layouts"
+description: "A list of layout components."
+---
+
+> 本页是 Fumadocs 官方文档的英文快照，获取于 2026-07-01。
+> [查看官网](https://www.fumadocs.dev/docs/ui/layouts) · [查看源文件](https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/layouts/index.mdx)
+
+A list of layout components.
+
+
+
+## Overview [#overview]
+
+Fumadocs UI provides essential layouts to display content.
+
+
+### Configurations [#configurations]
+
+Each layout supports a shared set of options.
+
+It is recommended to store these options into a file, and pass them to the layouts.
+
+<CodeBlockTabs defaultValue="Shared Options">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Shared Options">
+      Shared Options
+    </CodeBlockTabsTrigger>
+
+    <CodeBlockTabsTrigger value="Docs Layout">
+      Docs Layout
+    </CodeBlockTabsTrigger>
+
+    <CodeBlockTabsTrigger value="Home Layout">
+      Home Layout
+    </CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+
+  <CodeBlockTab value="Shared Options">
+    ```tsx  title="lib/layout.shared.tsx"
+    import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+
+    export function baseOptions(): BaseLayoutProps {
+      return {
+        nav: {
+          title: 'My App',
+        },
+      };
+    }
+    ```
+  </CodeBlockTab>
+
+  <CodeBlockTab value="Docs Layout">
+    ```tsx  title="app/docs/layout.tsx"
+    import { DocsLayout } from 'fumadocs-ui/layouts/docs';
+    import { baseOptions } from '@/lib/layout.shared';
+    import { source } from '@/lib/source';
+    import type { ReactNode } from 'react';
+
+    export default function Layout({ children }: { children: ReactNode }) {
+      return (
+        <DocsLayout
+          // [!code highlight]
+          {...baseOptions()}
+          tree={source.getPageTree()}
+        >
+          {children}
+        </DocsLayout>
+      );
+    }
+    ```
+  </CodeBlockTab>
+
+  <CodeBlockTab value="Home Layout">
+    ```tsx  title="app/(home)/layout.tsx"
+    import { HomeLayout } from 'fumadocs-ui/layouts/home';
+    import { baseOptions } from '@/lib/layout.shared';
+    import type { ReactNode } from 'react';
+
+    export default function Layout({ children }: { children: ReactNode }) {
+      return (
+        <HomeLayout
+          // [!code highlight]
+          {...baseOptions()}
+        >
+          {children}
+        </HomeLayout>
+      );
+    }
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+See detailed docs for [`links`](https://www.fumadocs.dev/docs/ui/layouts/links) and [`nav`](https://www.fumadocs.dev/docs/ui/layouts/nav) options.
+

@@ -1,0 +1,129 @@
+---
+title: "Static Build"
+description: "Output static website with Fumadocs."
+---
+
+> 本页是 Fumadocs 官方文档的英文快照，获取于 2026-07-01。
+> [查看官网](https://www.fumadocs.dev/docs/deploying/static) · [查看源文件](https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/deploying/static.mdx)
+
+Output static website with Fumadocs.
+
+
+
+## Setup [#setup]
+
+By default, Fumadocs use a server-first approach which always requires a running server to serve.
+
+You can output a static build by configuring your React framework.
+
+<div className="fd-steps">
+  <div className="fd-step">
+    ### Search [#search-step]
+
+    #### Built-in Search [#built-in-search]
+
+    1. [Configure Search Server](https://www.fumadocs.dev/docs/headless/search/orama#static-export).
+    2. [Configure Search UI/Client](/docs/fumadocs/search/orama#static).
+
+    After the configurations, your app will statically store the search indexes, and search will be computed on browser instead.
+
+    #### Cloud Solutions [#cloud-solutions]
+
+    Since the search functionality is powered by remote servers, static export works without configuration.
+  </div>
+
+  <div className="fd-step">
+    ### Deployment [#deployment-step]
+
+    #### Next.js [#nextjs]
+
+    You can enable Next.js static export, it allows you to export the app as a static HTML site without a Node.js server.
+
+    ```js title="next.config.mjs"
+    /**
+     * @type {import('next').NextConfig}
+     */
+    const nextConfig = {
+      output: 'export',
+
+      // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
+      // trailingSlash: true,
+
+      // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
+      // skipTrailingSlashRedirect: true,
+    };
+    ```
+
+    See [Next.js docs](https://nextjs.org/docs/app/guides/static-exports) for limitations and details.
+
+    #### React Router [#react-router]
+
+    By configuring SPA mode, you can serve the `build/client` directory as a static website.
+
+    <Callout type="warning" title="Don't forget to pre-render">
+      On SPA mode, all your server-side loaders must be pre-rendered.
+
+      See [React Router Docs](https://reactrouter.com/how-to/spa) for details.
+    </Callout>
+
+    ```ts title="react-router.config.ts"
+    import type { Config } from '@react-router/dev/config';
+    import { glob } from 'node:fs/promises';
+    import { createGetUrl, getSlugs } from 'fumadocs-core/source';
+
+    const getUrl = createGetUrl('/docs');
+
+    export default {
+      // disable SSR [!code highlight]
+      ssr: false,
+
+      // [!code ++:9]
+      async prerender({ getStaticPaths }) {
+        const paths: string[] = [...getStaticPaths()];
+
+        for await (const entry of glob('**/*.mdx', { cwd: 'content/docs' })) {
+          paths.push(getUrl(getSlugs(entry)));
+        }
+
+        return paths;
+      },
+    } satisfies Config;
+    ```
+
+    #### Tanstack Start [#tanstack-start]
+
+    Configure SPA mode and pre-rendering, refer to [SPA Mode](https://tanstack.com/start/latest/docs/framework/react/guide/spa-mode) for deploying SPA apps with Tanstack Start.
+
+    ```ts title="vite.config.ts"
+    import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+    import { defineConfig } from 'vite';
+
+    export default defineConfig({
+      plugins: [
+        // ...other plugins
+        tanstackStart({
+          spa: {
+            enabled: true,
+            // Tanstack Router will automatically crawl your pages [!code ++:4]
+            prerender: {
+              enabled: true,
+            },
+            // if you have any hidden paths that's not visible on UI, you can add them explicitly. [!code highlight:5]
+            pages: [
+              {
+                path: '/docs/test',
+              },
+            ],
+          },
+        }),
+      ],
+    });
+    ```
+
+    #### Waku [#waku]
+
+    Waku can serve your site statically when all pages are configured with `static` render mode.
+
+    See [Deployment](https://waku.gg/#deployment) for details.
+  </div>
+</div>

@@ -1,0 +1,43 @@
+# Dependencies and package-manager state
+/node_modules/
+/.pnp/
+.pnp.js
+/.npm/
+
+# Generated Fumadocs and Next.js files
+/.source/
+/.next/
+/out/
+/build/
+next-env.d.ts
+*.tsbuildinfo
+
+# Tests and caches
+/coverage/
+/.turbo/
+/.cache/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.crt
+
+# Deployment-provider state
+/.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors and operating systems
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,72 @@
+---
+title: "Navigation"
+description: "Configure navigation in your Fumadocs app."
+---
+
+> 本页是 Fumadocs 官方文档的英文快照，获取于 2026-07-01。
+> [查看官网](https://www.fumadocs.dev/docs/navigation) · [查看源文件](https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/navigation.mdx)
+
+Configure navigation in your Fumadocs app.
+
+
+
+
+
+## Overview [#overview]
+
+**Fumadocs UI** provides different layouts to display content, you can specify navigation configurations via layouts.
+
+<Cards>
+  <Card title="Layout Links" href="https://www.fumadocs.dev/docs/ui/layouts/links">
+    Display **navigation links** in your layouts.
+
+    It is useful for linking to frequently used resources like showcase and pricing pages.
+  </Card>
+
+  <Card title="Sidebar Items" href="/docs/fumadocs/ui/layouts/docs#sidebar-items">
+    Sidebar renders links to all documentation pages.
+
+    Under the hood, **Page Tree** is used to represent the navigation structure.
+  </Card>
+</Cards>
+
+## Versioning [#versioning]
+
+It's common for developer tool related docs to version their docs, such as different docs for v1 and v2 of the same tool.
+
+You can implement multi-version in your docs in your preferred way, using the primitives provided by Fumadocs.
+
+### Partial Versioning [#partial-versioning]
+
+When versioning only applies to part of your docs, You can separate them by folders.
+
+For example:
+
+<Files>
+  <Folder name="java-sdk">
+    <Folder name="v1">
+      <File name="getting-started.mdx" />
+    </Folder>
+
+    <Folder name="v2">
+      <File name="getting-started.mdx" />
+    </Folder>
+  </Folder>
+</Files>
+
+<Callout title="Good to Know">
+  When grouping with folders, you can display them as tabs [using Layout
+  Tabs](/docs/fumadocs/ui/layouts/docs#layout-tabs).
+</Callout>
+
+### Full Versioning [#full-versioning]
+
+Sometimes you want to version the entire website, such as [https://v14.fumadocs.dev](https://v14.fumadocs.dev) (Fumadocs v14) and [https://fumadocs.dev](https://fumadocs.dev) (Latest Fumadocs).
+
+You can create a Git branch for a version of docs (call it `v2` for example), and deploy it as a separate app on another subdomain like `v2.my-site.com`.
+
+Optionally, you can link to the other versions from your docs.
+This design allows some advantages over partial versioning:
+
+* Easy maintenance: Old docs/branches won't be affected when you iterate or upgrade dependencies.
+* Better consistency: Not just the docs itself, your landing page (and other pages) will also be versioned.

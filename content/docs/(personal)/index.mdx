@@ -1,0 +1,21 @@
+---
+title: 开始使用
+description: 个人文档站点的入口
+---
+
+这个站点使用 Fumadocs 和 Next.js 构建，并通过 Docker 运行。
+
+## 编写文档
+
+在 `content/docs` 目录中添加 Markdown 或 MDX 文件，然后重新构建容器：
+
+```bash
+docker compose up -d --build
+```
+
+## 当前能力
+
+- Markdown 和 MDX 内容
+- 代码高亮与目录导航
+- 本地全文搜索
+- `llms.txt` 和逐页 Markdown 输出

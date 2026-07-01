@@ -1,0 +1,34 @@
+---
+title: 关于本地快照
+description: Fumadocs 官方文档快照的来源、许可与更新方式
+---
+
+`Fumadocs 参考` 分区包含精选官方文档的英文快照，用于离线查阅和验证本站的
+导航、搜索与内容展示能力。
+
+## 来源
+
+- 上游仓库：[fuma-nama/fumadocs](https://github.com/fuma-nama/fumadocs)
+- 官方网站：[fumadocs.dev](https://www.fumadocs.dev)
+- 许可：MIT
+- 本地许可副本：`third_party/fumadocs/LICENSE`
+- 快照清单：`third_party/fumadocs/snapshot.json`
+
+每个导入页面顶部都显示原始页面和源文件链接。快照可能落后于官网，不应在
+没有复核差异的情况下自动更新。
+
+## 验证与更新
+
+验证已提交快照：
+
+```bash
+npm run docs:check
+```
+
+主动获取新快照：
+
+```bash
+npm run docs:sync
+```
+
+更新后必须检查内容差异，并重新运行应用和 Docker 验证。

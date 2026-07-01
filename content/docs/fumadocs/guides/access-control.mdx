@@ -1,0 +1,128 @@
+---
+title: "Access Control"
+description: "Limit the access of content."
+---
+
+> 本页是 Fumadocs 官方文档的英文快照，获取于 2026-07-01。
+> [查看官网](https://www.fumadocs.dev/docs/guides/access-control) · [查看源文件](https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/guides/access-control.mdx)
+
+Limit the access of content.
+
+
+
+## Overview [#overview]
+
+Thanks to the flexible design, it is simple to implement access control with Fumadocs.
+
+## Loader API [#loader-api]
+
+If you are using [`loader()`](https://www.fumadocs.dev/docs/headless/source-api) API, you can create the loaders on-demand, and filter files from content source to restrict accessible content.
+
+For example, this setup with Fumadocs MDX allows only MDX files with frontmatter `permission: public` to be shown.
+
+```ts title="lib/source.ts"
+import { docs } from 'collections/server';
+import { loader, update } from 'fumadocs-core/source';
+
+const filteredSource = update(docs.toFumadocsSource())
+  .files((files) =>
+    files.filter((file) => {
+      // keep meta files (e.g. `meta.json`)
+      if (file.type === 'meta') return true;
+
+      // access file data (type-safe)
+      return file.data.permission === 'public';
+    }),
+  )
+  .build();
+
+export const source = loader(filteredSource, {
+  baseUrl: '/docs',
+});
+```
+
+Or with more complicated setup, you may turn `source` into a factory function.
+
+<CodeBlockTabs defaultValue="lib/source.ts">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="lib/source.ts">
+      lib/source.ts
+    </CodeBlockTabsTrigger>
+
+    <CodeBlockTabsTrigger value="References">
+      References
+    </CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+
+  <CodeBlockTab value="lib/source.ts">
+    ```ts
+    import { docs } from 'collections/server';
+    import { loader, update } from 'fumadocs-core/source';
+
+    // uncached, it's better to cache it in-memory for real use case.
+    export function createSource(permission: 'public' | 'admin') {
+      const filteredSource = update(docs.toFumadocsSource())
+        .files((files) =>
+          files.filter((file) => {
+            if (file.type === 'meta') return true;
+
+            return file.data.permission === permission;
+          }),
+        )
+        .build();
+
+      return loader(filteredSource, {
+        baseUrl: '/docs',
+      });
+    }
+    ```
+  </CodeBlockTab>
+
+  <CodeBlockTab value="References">
+    ```ts
+    // [!code --]
+    import { source } from '@/lib/source';
+    // [!code ++:4]
+    import { createSource } from '@/lib/source';
+
+    const user = await getUser();
+    const source = createSource(user.permission);
+
+    const page = source.getPage(params.slugs);
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+### Advantages [#advantages]
+
+What is special with this approach is that **the access is limited at input level**, rather than at rendering phase or build-time.
+
+This guarantees the protected content is filtered entirely, and without compromise on flexibility.
+
+## Custom Implementation [#custom-implementation]
+
+Without using Loader API, you can also implement your access control at framework-level (e.g. via Next.js routing & proxy).
+
+For example, to limit access to certain pages:
+
+```tsx title="page.tsx"
+import { notFound } from 'next/navigation';
+import { source } from '@/lib/source';
+
+export default async function Page({ params }) {
+  const { slugs } = await params;
+  const user = await getUser();
+  const page = source.getPage(slugs);
+
+  if (!page) notFound();
+  if (page.data.permission !== user.permission) notFound();
+
+  // render page...
+}
+```
+
+Note that it is up to you to manage the page tree (sidebar items), search and other details.
+
+This approach offers the best flexibility, but it doesn't rely on Fumadocs itself for access control, the setup may take longer and be more complicated.
+
+It is better to consult the docs of your React.js framework when implementing.

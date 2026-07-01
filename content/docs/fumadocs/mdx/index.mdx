@@ -1,0 +1,127 @@
+---
+title: "Fumadocs MDX"
+description: "Introducing Fumadocs MDX, the official content source."
+---
+
+> 本页是 Fumadocs 官方文档的英文快照，获取于 2026-07-01。
+> [查看官网](https://www.fumadocs.dev/docs/mdx) · [查看源文件](https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/mdx/index.mdx)
+
+Introducing Fumadocs MDX, the official content source of Fumadocs.
+
+
+
+## Introduction [#introduction]
+
+Fumadocs MDX is a tool to transform content into type-safe data, similar to Content Collections.
+
+It is not a full CMS but rather a content processing layer for React frameworks, you can use it to handle blog posts and other contents.
+
+### What is a Collection? [#what-is-a-collection]
+
+**Collection** refers to a collection containing a certain type of files. You can define collections in the config file (`source.config.ts`).
+
+Fumadocs MDX transforms collections into type-safe data, accessible in your app. Available collections:
+
+<Tabs items={["doc", "meta", 'docs']}>
+  <Tab value="doc">
+    Compile Markdown & MDX files into a React Server Component, with useful properties like **Table of Contents**.
+
+    ```ts title="source.config.ts"
+    import { defineCollections } from 'fumadocs-mdx/config';
+
+    export const test = defineCollections({
+      type: 'doc',
+      dir: 'content/docs',
+    });
+    ```
+  </Tab>
+
+  <Tab value="meta">
+    Transform YAML/JSON files into an array of data.
+
+    ```ts title="source.config.ts"
+    import { defineCollections } from 'fumadocs-mdx/config';
+
+    export const test = defineCollections({
+      type: 'meta',
+      dir: 'content/docs',
+    });
+    ```
+  </Tab>
+
+  <Tab value="docs">
+    Combination of `meta` and `doc` collections, which is needed for Fumadocs.
+
+    ```ts title="source.config.ts"
+    import { defineDocs } from 'fumadocs-mdx/config';
+
+    export const docs = defineDocs({
+      dir: 'content/docs',
+      docs: {
+        // options for `doc` collection
+      },
+      meta: {
+        // options for `meta` collection
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+For example, a `doc` collection will transform the `.md` and `.mdx` files:
+
+<Files>
+  <Folder name="folder">
+    <File name="ui.md" />
+  </Folder>
+
+  <File name="hello.md" />
+
+  <File name="index.mdx" />
+
+  <File name="meta.json" className="opacity-50 cursor-not-allowed" />
+</Files>
+
+We will cover in [Accessing Collections](https://www.fumadocs.dev/docs/mdx/entry) later on how to access collection outputs.
+
+## Installation [#installation]
+
+Configure Fumadocs MDX on:
+
+<Cards>
+  <Card title="Next.js" href="/docs/fumadocs/mdx/next">
+    Using Fumadocs MDX with Next.js.
+  </Card>
+
+  <Card title="Vite" href="https://www.fumadocs.dev/docs/mdx/vite">
+    Using Fumadocs MDX with Vite.
+  </Card>
+
+  <Card title="Runtime Loader" href="https://www.fumadocs.dev/docs/mdx/loader">
+    Using Fumadocs MDX with a JavaScript runtime.
+  </Card>
+</Cards>
+
+## FAQ [#faq]
+
+### Built-in Properties [#built-in-properties]
+
+These properties are exported from MDX files by default.
+
+| Property              | Description                                     |
+| --------------------- | ----------------------------------------------- |
+| `frontmatter`         | Frontmatter                                     |
+| `toc`                 | Table of Contents                               |
+| `structuredData`      | Structured Data, useful for implementing search |
+| `extractedReferences` | For analyzing `hrefs` references                |
+
+### Customize Frontmatter [#customize-frontmatter]
+
+Use the [`schema`](/docs/fumadocs/mdx/collections#schema-1) option to pass a validation schema to validate frontmatter and define its output properties.
+
+### Customize MDX Compiler [#customize-mdx-compiler]
+
+Fumadocs MDX uses [MDX Compiler](https://mdxjs.com/packages/mdx) to compile MDX files into JavaScript files.
+The [default preset](https://www.fumadocs.dev/docs/mdx/mdx) includes a set of plugins and configurations out-of-the-box.
+
+You can customize it on [Global Config](https://www.fumadocs.dev/docs/mdx/global#mdx-options) or [Collection Config](/docs/fumadocs/mdx/collections#mdxoptions).

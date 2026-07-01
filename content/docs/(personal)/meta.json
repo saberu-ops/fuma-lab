@@ -1,0 +1,7 @@
+{
+  "title": "个人文档",
+  "description": "个人笔记与使用说明",
+  "icon": "BookOpen",
+  "root": true,
+  "pages": ["index", "test"]
+}

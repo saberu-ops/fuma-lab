@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "fetchedAt": "2026-07-01T08:11:28.668Z",
+  "upstreamRepository": "https://github.com/fuma-nama/fumadocs",
+  "upstreamBranch": "main",
+  "upstreamCommit": "b2667bde95b064222e0cdee874060b776671172a",
+  "license": "MIT",
+  "files": [
+    {
+      "sourceRoute": "/docs",
+      "officialUrl": "https://www.fumadocs.dev/docs",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/index.mdx",
+      "target": "content/docs/fumadocs/index.mdx",
+      "publicUrl": "/docs/fumadocs",
+      "sha256": "d9cda66ad66db853de773d42fffb14c52a69e17846b0140842fb3d8b0cb1738a"
+    },
+    {
+      "sourceRoute": "/docs/what-is-fumadocs",
+      "officialUrl": "https://www.fumadocs.dev/docs/what-is-fumadocs",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/what-is-fumadocs.mdx",
+      "target": "content/docs/fumadocs/what-is-fumadocs.mdx",
+      "publicUrl": "/docs/fumadocs/what-is-fumadocs",
+      "sha256": "2ca39ee433fcff51bdf49d0883efd18575a2e4f6fbdd32b1d095af19f944d81a"
+    },
+    {
+      "sourceRoute": "/docs/page-conventions",
+      "officialUrl": "https://www.fumadocs.dev/docs/page-conventions",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/page-conventions.mdx",
+      "target": "content/docs/fumadocs/page-conventions.mdx",
+      "publicUrl": "/docs/fumadocs/page-conventions",
+      "sha256": "20d39eba3fe31a9184e3a0f6ca43accdfd2aba37e7acaf77d09b4fc2b75be09c"
+    },
+    {
+      "sourceRoute": "/docs/markdown",
+      "officialUrl": "https://www.fumadocs.dev/docs/markdown",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/markdown/index.mdx",
+      "target": "content/docs/fumadocs/markdown.mdx",
+      "publicUrl": "/docs/fumadocs/markdown",
+      "sha256": "1aefdae3e983cc33236ace945c6c8e4f3dfc08f20de2b9fe8978dd365afad2c0"
+    },
+    {
+      "sourceRoute": "/docs/navigation",
+      "officialUrl": "https://www.fumadocs.dev/docs/navigation",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/navigation.mdx",
+      "target": "content/docs/fumadocs/navigation.mdx",
+      "publicUrl": "/docs/fumadocs/navigation",
+      "sha256": "df1e8141bcf46011c6697fdda2b2456b652dd339a1630da997ebbf21fe15c026"
+    },
+    {
+      "sourceRoute": "/docs/deploying",
+      "officialUrl": "https://www.fumadocs.dev/docs/deploying",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/deploying/index.mdx",
+      "target": "content/docs/fumadocs/deploying/index.mdx",
+      "publicUrl": "/docs/fumadocs/deploying",
+      "sha256": "a2e62b556736dcb23a1abe1cd5adc0546cbb818fb68ebc68a903bb039e7b542a"
+    },
+    {
+      "sourceRoute": "/docs/deploying/static",
+      "officialUrl": "https://www.fumadocs.dev/docs/deploying/static",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/deploying/static.mdx",
+      "target": "content/docs/fumadocs/deploying/static.mdx",
+      "publicUrl": "/docs/fumadocs/deploying/static",
+      "sha256": "9628802490daf563c6e2a8b6035528ca35b08aace3a99658defe4f5fdc0ce4ea"
+    },
+    {
+      "sourceRoute": "/docs/internationalization",
+      "officialUrl": "https://www.fumadocs.dev/docs/internationalization",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/internationalization/index.mdx",
+      "target": "content/docs/fumadocs/internationalization/index.mdx",
+      "publicUrl": "/docs/fumadocs/internationalization",
+      "sha256": "2bd7135efaa3ffcddd69f785006ae7936849e1989fb25c019fd4faffc22fbc42"
+    },
+    {
+      "sourceRoute": "/docs/internationalization/next",
+      "officialUrl": "https://www.fumadocs.dev/docs/internationalization/next",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/internationalization/next.mdx",
+      "target": "content/docs/fumadocs/internationalization/next.mdx",
+      "publicUrl": "/docs/fumadocs/internationalization/next",
+      "sha256": "e10574c96049ad87a6b4fb6cffb2dba4c28a44cd0eb69e22b27052b17537dcc7"
+    },
+    {
+      "sourceRoute": "/docs/search",
+      "officialUrl": "https://www.fumadocs.dev/docs/search",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/search/index.mdx",
+      "target": "content/docs/fumadocs/search/index.mdx",
+      "publicUrl": "/docs/fumadocs/search",
+      "sha256": "a6515c24fe3ff4e5d1a0316816976de1cfeb566ab9353077b980f7f42fccb2e4"
+    },
+    {
+      "sourceRoute": "/docs/search/orama",
+      "officialUrl": "https://www.fumadocs.dev/docs/search/orama",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/search/orama.mdx",
+      "target": "content/docs/fumadocs/search/orama.mdx",
+      "publicUrl": "/docs/fumadocs/search/orama",
+      "sha256": "1628a6c5a4c074a404e25082030ae9e5282a3f6ff4566e871c517ba40c90dc3a"
+    },
+    {
+      "sourceRoute": "/docs/guides/access-control",
+      "officialUrl": "https://www.fumadocs.dev/docs/guides/access-control",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/guides/access-control.mdx",
+      "target": "content/docs/fumadocs/guides/access-control.mdx",
+      "publicUrl": "/docs/fumadocs/guides/access-control",
+      "sha256": "45d2d36796b528359ca364b6476dfeaea083ec9f37a544a3199697716b1190bd"
+    },
+    {
+      "sourceRoute": "/docs/guides/customize-ui",
+      "officialUrl": "https://www.fumadocs.dev/docs/guides/customize-ui",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/guides/customize-ui.mdx",
+      "target": "content/docs/fumadocs/guides/customize-ui.mdx",
+      "publicUrl": "/docs/fumadocs/guides/customize-ui",
+      "sha256": "ace1ad950fa4bde124e89ede908278711e9d6b289d14d1e90d2af60fa6a9feac"
+    },
+    {
+      "sourceRoute": "/docs/integrations/llms",
+      "officialUrl": "https://www.fumadocs.dev/docs/integrations/llms",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/(framework)/integrations/llms.mdx",
+      "target": "content/docs/fumadocs/integrations/llms.mdx",
+      "publicUrl": "/docs/fumadocs/integrations/llms",
+      "sha256": "a7eeb138a83c594c2aa27dd8f893985e7acd06b68a06c1dae282d7e82cd27f38"
+    },
+    {
+      "sourceRoute": "/docs/ui",
+      "officialUrl": "https://www.fumadocs.dev/docs/ui",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/index.mdx",
+      "target": "content/docs/fumadocs/ui/index.mdx",
+      "publicUrl": "/docs/fumadocs/ui",
+      "sha256": "b44731793454066d5a08fd45ec8f37fc6f9dbbe00c439ccd411773726bd8c1eb"
+    },
+    {
+      "sourceRoute": "/docs/ui/search",
+      "officialUrl": "https://www.fumadocs.dev/docs/ui/search",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/search.mdx",
+      "target": "content/docs/fumadocs/ui/search.mdx",
+      "publicUrl": "/docs/fumadocs/ui/search",
+      "sha256": "3463d0f06dafa07a61201d3eec8f5a5592046ad6cb7d165713e19c0286eb3ce8"
+    },
+    {
+      "sourceRoute": "/docs/ui/translations",
+      "officialUrl": "https://www.fumadocs.dev/docs/ui/translations",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/translations.mdx",
+      "target": "content/docs/fumadocs/ui/translations.mdx",
+      "publicUrl": "/docs/fumadocs/ui/translations",
+      "sha256": "2fda748cf5c5893589f2834e8ab1336729de3f28dbf93a4964d10e740aa2cf01"
+    },
+    {
+      "sourceRoute": "/docs/ui/layouts",
+      "officialUrl": "https://www.fumadocs.dev/docs/ui/layouts",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/layouts/index.mdx",
+      "target": "content/docs/fumadocs/ui/layouts/index.mdx",
+      "publicUrl": "/docs/fumadocs/ui/layouts",
+      "sha256": "d667c176d4724e0e3aae5d91e054d573d1b23d1fb95897f2a3b9c16af22583d3"
+    },
+    {
+      "sourceRoute": "/docs/ui/layouts/docs",
+      "officialUrl": "https://www.fumadocs.dev/docs/ui/layouts/docs",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/layouts/docs.mdx",
+      "target": "content/docs/fumadocs/ui/layouts/docs.mdx",
+      "publicUrl": "/docs/fumadocs/ui/layouts/docs",
+      "sha256": "d378e37b2ea9f51d51997808b6764d5b652fb7de0f3aa3ff3ef2539cc15e3a9b"
+    },
+    {
+      "sourceRoute": "/docs/ui/layouts/root-provider",
+      "officialUrl": "https://www.fumadocs.dev/docs/ui/layouts/root-provider",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/layouts/root-provider.mdx",
+      "target": "content/docs/fumadocs/ui/layouts/root-provider.mdx",
+      "publicUrl": "/docs/fumadocs/ui/layouts/root-provider",
+      "sha256": "3b220692faf1038fa246caeccd21236318b0cc196ea74177f1be94697df6aa18"
+    },
+    {
+      "sourceRoute": "/docs/mdx",
+      "officialUrl": "https://www.fumadocs.dev/docs/mdx",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/mdx/index.mdx",
+      "target": "content/docs/fumadocs/mdx/index.mdx",
+      "publicUrl": "/docs/fumadocs/mdx",
+      "sha256": "cf92e12bbd6a0f9388550af53ef6bdf608ddf080c8dda8e073d07989d5895cb8"
+    },
+    {
+      "sourceRoute": "/docs/mdx/next",
+      "officialUrl": "https://www.fumadocs.dev/docs/mdx/next",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/mdx/(integrations)/next.mdx",
+      "target": "content/docs/fumadocs/mdx/next.mdx",
+      "publicUrl": "/docs/fumadocs/mdx/next",
+      "sha256": "67442954f3c3a433f6039a643d3be8c1525f57dbd490f742b2289c44d048a13b"
+    },
+    {
+      "sourceRoute": "/docs/mdx/collections",
+      "officialUrl": "https://www.fumadocs.dev/docs/mdx/collections",
+      "sourceUrl": "https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/mdx/collections.mdx",
+      "target": "content/docs/fumadocs/mdx/collections.mdx",
+      "publicUrl": "/docs/fumadocs/mdx/collections",
+      "sha256": "cb87afd02a9e8876aab34035e8edb31f40f2dbf413e6a9ee48dfceb4fb53e32a"
+    }
+  ]
+}

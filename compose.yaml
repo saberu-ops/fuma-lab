@@ -1,0 +1,37 @@
+services:
+  docs:
+    image: fumadocs-personal:local
+    build:
+      context: .
+      args:
+        NODE_VERSION: "24.18.0"
+        SITE_URL: "${SITE_URL:-http://localhost:3000}"
+    restart: unless-stopped
+    init: true
+    ports:
+      - "127.0.0.1:${DOCS_PORT:-3000}:3000"
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+      - /app/.next/cache:uid=1000,gid=1000,mode=0755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 256
+    stop_grace_period: 10s
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/docs').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"

@@ -1,0 +1,143 @@
+---
+title: "Root Provider"
+description: "The context provider of Fumadocs UI."
+---
+
+> 本页是 Fumadocs 官方文档的英文快照，获取于 2026-07-01。
+> [查看官网](https://www.fumadocs.dev/docs/ui/layouts/root-provider) · [查看源文件](https://raw.githubusercontent.com/fuma-nama/fumadocs/refs/heads/main/apps/docs/content/docs/ui/layouts/root-provider.mdx)
+
+The context provider of Fumadocs UI.
+
+
+
+The context provider of all the components, including `next-themes` and [`<FrameworkProvider />`](https://www.fumadocs.dev/docs/headless#installation). It should be located at the root layout.
+
+## Usage [#usage]
+
+Import it according to your React.js framework:
+
+<CodeBlockTabs defaultValue="Next.js">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Next.js">
+      Next.js
+    </CodeBlockTabsTrigger>
+
+    <CodeBlockTabsTrigger value="React Router">
+      React Router
+    </CodeBlockTabsTrigger>
+
+    <CodeBlockTabsTrigger value="Tanstack">
+      Tanstack
+    </CodeBlockTabsTrigger>
+
+    <CodeBlockTabsTrigger value="Waku">
+      Waku
+    </CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+
+  <CodeBlockTab value="Next.js">
+    ```jsx
+    import { RootProvider } from 'fumadocs-ui/provider/next';
+
+    export default function Layout({ children }) {
+      return (
+        <html lang="en">
+          <body>
+            <RootProvider>{children}</RootProvider>
+          </body>
+        </html>
+      );
+    }
+    ```
+  </CodeBlockTab>
+
+  <CodeBlockTab value="React Router">
+    ```jsx
+    import { RootProvider } from 'fumadocs-ui/provider/react-router';
+
+    export function Layout({ children }) {
+      return (
+        <html lang="en">
+          <body>
+            <RootProvider>{children}</RootProvider>
+          </body>
+        </html>
+      );
+    }
+    ```
+  </CodeBlockTab>
+
+  <CodeBlockTab value="Tanstack">
+    ```jsx
+    import {
+      HeadContent,
+      Scripts,
+    } from '@tanstack/react-router';
+    import { RootProvider } from 'fumadocs-ui/provider/tanstack';
+
+    function RootDocument({ children }: { children: React.ReactNode }) {
+      return (
+        <html suppressHydrationWarning>
+          <head>
+            <HeadContent />
+          </head>
+          <body className="flex flex-col min-h-screen">
+            <RootProvider>{children}</RootProvider>
+            <Scripts />
+          </body>
+        </html>
+      );
+    }
+
+    ```
+  </CodeBlockTab>
+
+  <CodeBlockTab value="Waku">
+    ```jsx
+    import { RootProvider } from 'fumadocs-ui/provider/waku';
+
+    export default function Layout({ children }) {
+      return (
+        <html lang="en">
+          <body>
+            <RootProvider>{children}</RootProvider>
+          </body>
+        </html>
+      );
+    }
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+### Search Dialog [#search-dialog]
+
+Customize or disable the search dialog with `search` option.
+
+```jsx
+<RootProvider
+  search={{
+    enabled: false,
+  }}
+>
+  {children}
+</RootProvider>
+```
+
+Learn more from [Search](/docs/fumadocs/ui/search).
+
+### Theme Provider [#theme-provider]
+
+Fumadocs supports light/dark modes with [`next-themes`](https://github.com/pacocoursey/next-themes).
+Customize or disable it with `theme` option.
+
+```jsx
+<RootProvider
+  theme={{
+    enabled: false,
+  }}
+>
+  {children}
+</RootProvider>
+```
+
+You can also install & reference `next-themes` in your code for managing themes.
