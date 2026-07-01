@@ -1,11 +1,97 @@
 # Fumadocs Personal
 
-基于 Next.js 和 Fumadocs 的个人文档站点。应用以不可变 Docker 镜像运行，
-文档源文件保存在 `content/docs`。
+基于 Next.js 和 Fumadocs 的个人文档站点，默认以不可变 Docker 镜像运行。
+项目同时包含个人中文文档和一组可离线使用的 Fumadocs 官方英文文档快照。
+
+当前能力：
+
+- 搜索框下方提供 `个人文档` 与 `Fumadocs 参考` 两个原生 Layout Tab。
+- 文档、搜索索引和静态资源均随镜像构建，运行时不依赖官网。
+- 容器以非 root 用户运行，根文件系统只读，端口只绑定宿主机回环地址。
+- 提供本地开发、快照完整性校验和受控的官网快照更新脚本。
+
+## Docker 快速开始
+
+要求 Docker Engine 和 Compose v2 插件。Docker 部署不要求宿主机安装 Node.js。
+
+```bash
+docker compose config --quiet
+docker compose up -d --build
+docker compose ps
+```
+
+打开 <http://127.0.0.1:3000/docs>。正常状态应显示服务为 `healthy`。
+
+查看日志或停止服务：
+
+```bash
+docker compose logs --tail=200 -f docs
+docker compose down
+```
+
+详细的发布、回滚、备份、升级和故障处理步骤见
+[运行手册](docs/features/fumadocs/operations.md)。
+
+## 配置
+
+| 变量 | 默认值 | 用途 | 何时生效 |
+| --- | --- | --- | --- |
+| `DOCS_PORT` | `3000` | 宿主机回环地址上的监听端口 | 重建容器 |
+| `SITE_URL` | `http://localhost:3000` | 生成页面和 OG 元数据使用的公开基址 | 重新构建镜像 |
+
+修改端口时应同时提供与访问地址一致的 `SITE_URL`：
+
+```bash
+DOCS_PORT=3100 SITE_URL=http://127.0.0.1:3100 \
+  docker compose up -d --build
+```
+
+容器始终监听内部端口 `3000`。`SITE_URL` 会在构建阶段写入应用，修改后仅
+`docker compose restart` 不会生效。
+
+## 内容与语言
+
+内容位于 `content/docs`：
+
+- `content/docs/(personal)`：本项目维护的中文个人文档，URL 仍从 `/docs`
+  开始，括号目录不会出现在路由中。
+- `content/docs/fumadocs`：23 篇精选官方英文文档的本地快照，入口为
+  `/docs/fumadocs`。
+
+本站没有自动翻译功能。`app/layout.tsx` 声明页面语言为 `zh-CN`，个人内容
+本身以中文编写；离线参考内容本身是英文。当前内置界面和搜索分词仍使用
+英语，浏览器可能另外提供自己的网页翻译。
+
+修改个人文档后，Docker 服务需要重新构建：
+
+```bash
+docker compose up -d --build
+```
+
+## 离线参考快照
+
+正常构建和运行只读取已经提交的本地文件，不访问 Fumadocs 官网。验证快照
+文件、固定白名单和 SHA-256 清单：
+
+```bash
+npm run docs:check
+```
+
+只有主动更新快照时才需要联网：
+
+```bash
+npm run docs:sync
+git diff -- content/docs/fumadocs third_party/fumadocs/snapshot.json
+npm run docs:check
+```
+
+更新后必须人工检查差异。来源、上游提交、获取时间和文件哈希记录在
+`third_party/fumadocs/snapshot.json`；授权和修改说明见
+[第三方声明](third_party/fumadocs/NOTICE.md)。
 
 ## 本地开发
 
-需要 Node.js 24.14 或更高的 24.x 版本。
+要求 Node.js `>=24.14.0 <25`，项目固定的开发与容器版本为 `24.18.0`。
 
 ```bash
 npm ci
@@ -14,75 +100,9 @@ npm run dev
 
 打开 <http://localhost:3000/docs>。
 
-## 内容分区与语言
-
-搜索框下方的下拉框来自 Fumadocs Layout Tabs，目前包含：
-
-- `个人文档`：本项目直接维护的中文内容。
-- `Fumadocs 参考`：精选官方文档的英文离线快照。
-
-本站没有自动翻译功能。`app/layout.tsx` 中的 `lang="zh-CN"` 声明默认页面语言，
-Fumadocs 内置界面和搜索分词仍采用英语。
-
-## 离线参考快照
-
-正常构建和运行只读取已经提交的本地文件，不会访问 Fumadocs 官网。
-
-验证快照文件与清单哈希：
-
-```bash
-npm run docs:check
-```
-
-主动联网更新 23 篇精选页面：
-
-```bash
-npm run docs:sync
-```
-
-更新操作使用固定页面白名单。完成后必须检查内容差异并重新运行所有验证。
-来源、提交版本和文件哈希记录在 `third_party/fumadocs/snapshot.json`，上游
-MIT 许可证保存在 `third_party/fumadocs/LICENSE`。
-
-## Docker 部署
-
-```bash
-docker compose up -d --build
-docker compose ps
-```
-
-站点仅监听宿主机回环地址：
-
-```text
-http://127.0.0.1:3000/docs
-```
-
-可通过 `DOCS_PORT` 修改宿主机端口：
-
-```bash
-DOCS_PORT=3100 docker compose up -d
-```
-
-如果通过域名访问，请在构建时设置公开地址，以生成正确的 OG 元数据：
-
-```bash
-SITE_URL=https://docs.example.com docker compose up -d --build
-```
-
-查看日志或停止服务：
-
-```bash
-docker compose logs -f docs
-docker compose down
-```
-
-容器没有内容卷。修改 `content/docs` 后，需要重新构建镜像：
-
-```bash
-docker compose up -d --build
-```
-
 ## 验证
+
+提交或部署内容、依赖及配置变更前运行：
 
 ```bash
 npm run lint
@@ -92,5 +112,21 @@ npm run build
 docker compose config --quiet
 ```
 
-认证、TLS 和公网反向代理不属于当前基线。不要在未增加访问控制的情况下
-直接把端口暴露到公网。
+## 目录
+
+| 路径 | 作用 |
+| --- | --- |
+| `app` | Next.js 路由、页面布局、搜索及 LLM 文本接口 |
+| `components`、`lib` | MDX 组件和 Fumadocs 数据源配置 |
+| `content/docs` | 个人文档与离线参考快照 |
+| `scripts` | 快照同步与完整性校验工具 |
+| `third_party/fumadocs` | 上游许可证、声明和快照清单 |
+| `Dockerfile`、`compose.yaml` | 不可变镜像和受限容器配置 |
+| `docs/features/fumadocs` | 运维运行手册 |
+| `docs/reviews` | 实施计划和变更记录 |
+
+## 安全边界
+
+当前基线不包含身份认证、TLS 或公网反向代理。Compose 只发布
+`127.0.0.1:${DOCS_PORT}:3000`；不要改为 `0.0.0.0` 或直接暴露到公网。
+需要远程访问时，应先在受控反向代理或私有网络层实现 TLS 和访问控制。
