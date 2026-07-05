@@ -15,7 +15,7 @@ ARG SITE_URL=http://localhost:3000
 ENV SITE_URL=${SITE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+RUN npm run verify && npm run build
 
 FROM base AS runner
 ARG SITE_URL=http://localhost:3000

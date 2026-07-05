@@ -1,21 +1,21 @@
 ---
 title: 开始使用
-description: 个人文档站点的入口
+description: 个人知识库与学习笔记入口
 ---
 
-这个站点使用 Fumadocs 和 Next.js 构建，并通过 Docker 运行。
+这里集中维护可以长期积累、检索和复习的个人内容。
 
-## 编写文档
+<Cards>
+  <Card
+    title="日语 N2 学习笔记"
+    description="按专题和课次整理听力、口语、语法与词汇"
+    href="/docs/japanese-n2"
+  />
+</Cards>
 
-在 `content/docs` 目录中添加 Markdown 或 MDX 文件，然后重新构建容器：
+## 内容组织
 
-```bash
-docker compose up -d --build
-```
-
-## 当前能力
-
-- Markdown 和 MDX 内容
-- 代码高亮与目录导航
-- 本地全文搜索
-- `llms.txt` 和逐页 Markdown 输出
+- 每个学习领域拥有独立入口。
+- 较长专题按课次拆分，便于定位、分享和复习。
+- 页面提供目录导航、全文搜索和 Markdown 复制。
+- 新内容遵循固定模板，减少重复整理工作。

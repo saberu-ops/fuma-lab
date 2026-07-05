@@ -16,6 +16,11 @@ container runtime.
 - The page tree has `个人文档` and `Fumadocs 参考` roots. The second root contains
   an attributed 23-page English snapshot with a fixed allowlist and hash
   manifest under `third_party/fumadocs/`.
+- The personal root contains an extensible Japanese N2 learning area organized
+  by topic and lesson, with a scaffold command for adding consistently
+  structured Git/MDX pages.
+- Search uses a local mixed Chinese/Japanese/English tokenizer. CJK text is
+  indexed as overlapping bigrams while Latin words remain intact.
 - Normal application build and runtime are offline with respect to upstream
   documentation. `npm run docs:sync` is the explicit networked refresh action.
 - Implementation records are tracked under `docs/reviews/`.
@@ -25,9 +30,12 @@ container runtime.
 - Public access versus an authenticated private deployment.
 - Reverse proxy and TLS provider.
 - Whether future content authoring remains Git/MDX-only or gains a CMS.
-- Mandarin-specific search tokenization.
 - Whether the mixed Chinese/English content should become fully routed i18n.
 
 ## Project Feedback
 
 Record project-specific recurring corrections here when they are discovered.
+
+- Every code or application-configuration change must include a round
+  changelog under `docs/reviews/`. A separate plan record is not required unless
+  the user explicitly requests one.

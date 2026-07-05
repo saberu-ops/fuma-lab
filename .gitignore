@@ -16,6 +16,8 @@ next-env.d.ts
 /coverage/
 /.turbo/
 /.cache/
+__pycache__/
+*.py[cod]
 
 # Local configuration and secrets
 .env

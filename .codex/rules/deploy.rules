@@ -1,0 +1,16 @@
+# Permit only the reviewed repository deployment entry point to leave the
+# workspace sandbox. The script rejects unknown arguments and owns Docker
+# validation, switching, smoke tests, and rollback.
+prefix_rule(
+    pattern = ["npm", "run", "deploy"],
+    decision = "allow",
+    justification = "Run the repository's reviewed local deployment workflow",
+    match = [
+        "npm run deploy",
+    ],
+    not_match = [
+        "npm run deploy:check",
+        "npm run build",
+        "docker compose up -d",
+    ],
+)

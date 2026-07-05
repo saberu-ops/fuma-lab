@@ -1,0 +1,7 @@
+{
+  "title": "听力转口语精读",
+  "description": "从听力输入到日常和职场口语输出",
+  "icon": "AudioLines",
+  "defaultOpen": true,
+  "pages": ["index", "..."]
+}

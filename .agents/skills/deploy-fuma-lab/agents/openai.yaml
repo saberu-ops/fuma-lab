@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deploy Fuma Lab"
+  short_description: "Validate, deploy, verify, and preserve rollback"
+  default_prompt: "Use $deploy-fuma-lab to validate and redeploy the current Fuma Lab workspace."

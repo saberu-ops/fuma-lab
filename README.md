@@ -55,18 +55,45 @@ DOCS_PORT=3100 SITE_URL=http://127.0.0.1:3100 \
 
 - `content/docs/(personal)`：本项目维护的中文个人文档，URL 仍从 `/docs`
   开始，括号目录不会出现在路由中。
+- `content/docs/(personal)/japanese-n2`：按专题和课次维护的日语 N2
+  学习笔记，包含听力转口语精读，以及 32 个核心词汇和 13 个语法句型；
+  入口为 `/docs/japanese-n2`。
 - `content/docs/fumadocs`：23 篇精选官方英文文档的本地快照，入口为
   `/docs/fumadocs`。
 
 本站没有自动翻译功能。`app/layout.tsx` 声明页面语言为 `zh-CN`，个人内容
-本身以中文编写；离线参考内容本身是英文。当前内置界面和搜索分词仍使用
-英语，浏览器可能另外提供自己的网页翻译。
+本身以中文编写；离线参考内容本身是英文。站内搜索使用中日英混合分词，
+支持检索连续的中文、日文语块和英文技术词。浏览器可能另外提供网页翻译。
 
-修改个人文档后，Docker 服务需要重新构建：
+修改个人文档或应用代码后，使用统一部署入口：
 
 ```bash
-docker compose up -d --build
+npm run deploy
 ```
+
+该命令会在镜像内执行 lint、文档快照检查、类型检查和生产构建，保存当前运行
+镜像作为回滚版本，切换容器后检查健康状态、页面、搜索和音频 Range 请求。
+切换后的检查失败时会自动恢复上一镜像。只构建验证、不替换容器时运行
+`npm run deploy:check`。未安装 Node.js/npm 的 Docker-only 宿主机可直接运行
+`bash scripts/deploy.sh`。
+
+在 Codex 中也可以直接输入 `$deploy-fuma-lab`。仓库级 Skill 和
+`AGENTS.md` 会让 Codex 在完成可见内容或代码修改后使用同一部署入口；用户
+明确要求不部署、只做审查或验证失败时除外。
+
+首次加入或修改这些 Codex 配置后应新开会话，使 `AGENTS.md` 和项目规则重新
+加载；项目级 `.codex` 配置仅在该仓库被信任时生效。
+
+新增一篇听力转口语笔记：
+
+```bash
+npm run note:new -- \
+  --slug 04-requesting-a-change \
+  --title "第四课：请求调整安排"
+```
+
+目录约定、新专题创建方式和内容检查清单见
+[日语 N2 内容维护指南](docs/features/japanese-n2/content-authoring.md)。
 
 ## 离线参考快照
 

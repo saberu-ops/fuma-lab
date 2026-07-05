@@ -1,0 +1,7 @@
+{
+  "title": "日语 N2",
+  "description": "日语 N2 学习与输出训练",
+  "icon": "Languages",
+  "defaultOpen": true,
+  "pages": ["index", "listening-to-speaking", "core-vocabulary-grammar", "..."]
+}
