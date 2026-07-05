@@ -1,0 +1,581 @@
+<title>Fuma Lab · 设计方案资料</title>
+<style>
+  :root {
+    --paper: #eff0ea;
+    --surface: #fbfbf8;
+    --surface-2: #f4f4ee;
+    --ink: #1a2230;
+    --ink-soft: #4a5468;
+    --ink-faint: #7c8496;
+    --line: #d9dacf;
+    --line-soft: #e6e6dc;
+    --indigo: #33507e;
+    --indigo-deep: #26406a;
+    --vermilion: #b24a3a;
+    --celadon: #5f8a7b;
+    --gold: #9a7b3c;
+    --shadow: 0 1px 2px rgba(26,34,48,.05), 0 8px 24px rgba(26,34,48,.05);
+    --serif: "Iowan Old Style", "Songti SC", "SongtiSC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, "Times New Roman", serif;
+    --sans: "PingFang SC", "Hiragino Sans", "Hiragino Sans GB", "Microsoft YaHei", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "SF Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #12161d;
+      --surface: #191e27;
+      --surface-2: #202632;
+      --ink: #e9e7de;
+      --ink-soft: #b3b8c2;
+      --ink-faint: #7f8695;
+      --line: #2c333f;
+      --line-soft: #232a34;
+      --indigo: #7ea0d8;
+      --indigo-deep: #9db9e6;
+      --vermilion: #e07a68;
+      --celadon: #8bbaa9;
+      --gold: #cba95f;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #eff0ea; --surface: #fbfbf8; --surface-2: #f4f4ee;
+    --ink: #1a2230; --ink-soft: #4a5468; --ink-faint: #7c8496;
+    --line: #d9dacf; --line-soft: #e6e6dc;
+    --indigo: #33507e; --indigo-deep: #26406a; --vermilion: #b24a3a;
+    --celadon: #5f8a7b; --gold: #9a7b3c;
+    --shadow: 0 1px 2px rgba(26,34,48,.05), 0 8px 24px rgba(26,34,48,.05);
+  }
+  :root[data-theme="dark"] {
+    --paper: #12161d; --surface: #191e27; --surface-2: #202632;
+    --ink: #e9e7de; --ink-soft: #b3b8c2; --ink-faint: #7f8695;
+    --line: #2c333f; --line-soft: #232a34;
+    --indigo: #7ea0d8; --indigo-deep: #9db9e6; --vermilion: #e07a68;
+    --celadon: #8bbaa9; --gold: #cba95f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "kern" 1;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+  section { padding: 64px 0; border-top: 1px solid var(--line-soft); }
+  section:first-of-type { border-top: none; }
+
+  a { color: var(--indigo); text-decoration: none; }
+
+  /* ---- Masthead ---- */
+  .masthead { padding: 72px 0 56px; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .kicker::before {
+    content: ""; width: 34px; height: 1px; background: var(--indigo); display: inline-block;
+  }
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(38px, 6vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+    margin: 22px 0 0;
+  }
+  h1.title .cn { color: var(--ink); }
+  .thesis {
+    font-family: var(--serif);
+    font-size: clamp(18px, 2.4vw, 23px);
+    color: var(--ink-soft);
+    max-width: 34em;
+    line-height: 1.55;
+    margin: 24px 0 0;
+    text-wrap: pretty;
+  }
+  .seal {
+    float: right;
+    margin: 6px 0 0 24px;
+    width: 88px; height: 88px;
+    border: 1.5px solid var(--vermilion);
+    border-radius: 10px;
+    color: var(--vermilion);
+    display: grid; place-content: center; text-align: center;
+    font-family: var(--serif); font-weight: 600;
+    line-height: 1.15;
+    transform: rotate(-3deg);
+    letter-spacing: .04em;
+    flex: none;
+  }
+  .seal small { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .12em; margin-top: 4px; opacity: .8; }
+
+  /* ---- Fact strip ---- */
+  .facts {
+    margin-top: 44px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .fact { background: var(--surface); padding: 18px 20px; }
+  .fact dt {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ink-faint); margin: 0;
+  }
+  .fact dd {
+    margin: 8px 0 0; font-family: var(--serif); font-size: 26px;
+    font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums;
+  }
+  .fact dd span { font-size: 13px; font-family: var(--sans); color: var(--ink-soft); font-weight: 400; }
+
+  /* ---- Section headers ---- */
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 34px; }
+  .sec-num {
+    font-family: var(--mono); font-size: 13px; color: var(--celadon);
+    letter-spacing: .1em; padding-top: 6px;
+  }
+  h2 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: clamp(25px, 3.4vw, 33px); margin: 0; letter-spacing: -.01em;
+    text-wrap: balance;
+  }
+  .sec-head p { margin: 6px 0 0; color: var(--ink-soft); font-size: 15px; max-width: 46em; }
+
+  /* ---- Pillars ---- */
+  .pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .pillar {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 26px 26px 24px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .tag {
+    display: inline-block; align-self: flex-start;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 999px;
+    background: color-mix(in srgb, var(--celadon) 15%, transparent);
+    color: var(--celadon); border: 1px solid color-mix(in srgb, var(--celadon) 35%, transparent);
+  }
+  .tag.i { background: color-mix(in srgb, var(--indigo) 13%, transparent); color: var(--indigo); border-color: color-mix(in srgb, var(--indigo) 32%, transparent); }
+  .tag.v { background: color-mix(in srgb, var(--vermilion) 12%, transparent); color: var(--vermilion); border-color: color-mix(in srgb, var(--vermilion) 32%, transparent); }
+  .tag.g { background: color-mix(in srgb, var(--gold) 13%, transparent); color: var(--gold); border-color: color-mix(in srgb, var(--gold) 32%, transparent); }
+  .pillar h3 { font-family: var(--serif); font-size: 21px; font-weight: 600; margin: 2px 0 0; }
+  .pillar p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
+  .pillar ul { margin: 4px 0 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .pillar li { font-size: 13.5px; color: var(--ink-soft); padding-left: 18px; position: relative; }
+  .pillar li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 6px; height: 6px; border-radius: 2px; background: var(--indigo); opacity: .55; }
+  code, .k { font-family: var(--mono); font-size: .88em; }
+  .pillar li code, .tree code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; color: var(--ink); border: 1px solid var(--line-soft); }
+
+  /* ---- Data flow ---- */
+  .flow { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .flow-col {
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface);
+  }
+  .flow-col > header {
+    padding: 14px 20px; font-family: var(--mono); font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+  }
+  .flow-col.build > header { background: color-mix(in srgb, var(--indigo) 12%, var(--surface)); color: var(--indigo-deep); border-bottom: 1px solid var(--line); }
+  .flow-col.run > header { background: color-mix(in srgb, var(--celadon) 12%, var(--surface)); color: var(--celadon); border-bottom: 1px solid var(--line); }
+  .flow-col > header .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .flow-body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .node {
+    border: 1px solid var(--line); border-radius: 9px; padding: 11px 14px;
+    background: var(--surface-2); font-size: 13.5px;
+  }
+  .node b { font-weight: 600; color: var(--ink); }
+  .node span { color: var(--ink-faint); font-family: var(--mono); font-size: 11.5px; display: block; margin-top: 3px; }
+  .arrow { text-align: center; color: var(--ink-faint); font-size: 15px; line-height: 1; }
+  .flow-note { margin-top: 18px; font-size: 13.5px; color: var(--ink-soft); text-align: center; }
+  .flow-note b { color: var(--vermilion); font-family: var(--mono); font-size: 12px; letter-spacing: .04em; }
+
+  /* ---- Tree ---- */
+  .split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 26px; align-items: start; }
+  .tree {
+    font-family: var(--mono); font-size: 13px; line-height: 1.9;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 22px 24px; box-shadow: var(--shadow); overflow-x: auto;
+  }
+  .tree .r { color: var(--indigo); font-weight: 600; }
+  .tree .n { color: var(--ink); }
+  .tree .c { color: var(--ink-faint); }
+  .tree .m { color: var(--celadon); }
+  .prose p { color: var(--ink-soft); font-size: 15px; }
+  .prose h4 { font-family: var(--serif); font-size: 18px; margin: 22px 0 8px; color: var(--ink); }
+  .prose h4:first-child { margin-top: 0; }
+  .prose ul { padding-left: 18px; margin: 8px 0; }
+  .prose li { color: var(--ink-soft); font-size: 14.5px; margin: 5px 0; }
+
+  /* ---- Tokenizer demo ---- */
+  .token-demo {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px 26px; box-shadow: var(--shadow);
+  }
+  .token-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .token-row:last-child { margin-bottom: 0; }
+  .token-row .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); width: 72px; flex: none; }
+  .src { font-family: var(--serif); font-size: 22px; color: var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-family: var(--mono); font-size: 13px; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+  }
+  .chip.cjk { border-color: color-mix(in srgb, var(--indigo) 40%, transparent); color: var(--indigo); background: color-mix(in srgb, var(--indigo) 9%, transparent); }
+  .chip.lat { border-color: color-mix(in srgb, var(--celadon) 40%, transparent); color: var(--celadon); background: color-mix(in srgb, var(--celadon) 9%, transparent); }
+
+  /* ---- Pipeline ---- */
+  .pipe { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: grid; grid-template-columns: 52px 1fr; gap: 20px;
+    padding: 18px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .step:last-child { border-bottom: none; }
+  .step .idx {
+    font-family: var(--serif); font-size: 28px; font-weight: 600; color: var(--indigo);
+    font-variant-numeric: tabular-nums; line-height: 1; padding-top: 2px;
+  }
+  .step h4 { margin: 0 0 3px; font-size: 16px; font-family: var(--sans); font-weight: 600; }
+  .step p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+  .step.guard .idx { color: var(--vermilion); }
+
+  /* ---- Security ---- */
+  .sec-panel {
+    background: color-mix(in srgb, var(--vermilion) 7%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--vermilion) 30%, var(--line));
+    border-radius: 14px; padding: 26px 28px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  }
+  .sec-panel h4 { font-family: var(--serif); margin: 0 0 10px; font-size: 17px; }
+  .sec-panel .allow h4 { color: var(--celadon); }
+  .sec-panel .deny h4 { color: var(--vermilion); }
+  .sec-panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .sec-panel li { font-size: 14px; color: var(--ink-soft); padding-left: 22px; position: relative; }
+  .sec-panel .allow li::before { content: "✓"; position: absolute; left: 0; color: var(--celadon); font-weight: 700; }
+  .sec-panel .deny li::before { content: "✕"; position: absolute; left: 0; color: var(--vermilion); font-weight: 700; }
+
+  /* ---- Open questions ---- */
+  .open { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .qcard { border: 1px dashed var(--line); border-radius: 12px; padding: 18px 20px; background: var(--surface); }
+  .qcard .q { font-family: var(--serif); font-size: 16px; color: var(--ink); margin: 0 0 6px; }
+  .qcard .a { font-size: 13.5px; color: var(--ink-faint); margin: 0; }
+
+  /* ---- Footer ---- */
+  footer { border-top: 1px solid var(--line); padding: 40px 0 60px; }
+  .stackline { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+  .stackline span {
+    font-family: var(--mono); font-size: 12px; padding: 4px 11px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--ink-soft); background: var(--surface);
+  }
+  .foot-meta { color: var(--ink-faint); font-size: 12.5px; margin-top: 22px; font-family: var(--mono); letter-spacing: .04em; }
+
+  @media (max-width: 760px) {
+    .facts { grid-template-columns: repeat(2, 1fr); }
+    .pillars, .flow, .open { grid-template-columns: 1fr; }
+    .split, .sec-panel { grid-template-columns: 1fr; }
+    .seal { width: 72px; height: 72px; margin-left: 16px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="seal">资料<small>DESIGN</small></div>
+    <div class="kicker">设计方案资料 · Design Dossier</div>
+    <h1 class="title"><span class="cn">Fuma Lab</span> 个人文档实验室</h1>
+    <p class="thesis">以不可变 Docker 镜像运行的个人文档站：内容即代码，离线优先，中日英同源检索。一处编写，构建即封存，部署可回滚。</p>
+    <dl class="facts">
+      <div class="fact"><dt>运行时形态</dt><dd>不可变镜像<span></span></dd></div>
+      <div class="fact"><dt>文档根</dt><dd>2 <span>个原生 Tab</span></dd></div>
+      <div class="fact"><dt>离线参考</dt><dd>23 <span>篇快照 · SHA-256</span></dd></div>
+      <div class="fact"><dt>网络依赖</dt><dd>0 <span>运行时对上游</span></dd></div>
+    </dl>
+  </header>
+
+  <!-- 1. 四本柱 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 01</span>
+      <div>
+        <h2>四本设计支柱</h2>
+        <p>四个关注点相互正交：内容体系、离线参考、同源检索、封存部署。任意一个都可独立演进而不牵动其余。</p>
+      </div>
+    </div>
+    <div class="pillars">
+      <article class="pillar">
+        <span class="tag i">Content · 内容</span>
+        <h3>双根内容体系</h3>
+        <p>搜索框下方两个 Fumadocs 原生 Layout Tab，分隔个人与参考两类内容。</p>
+        <ul>
+          <li><code>(personal)</code> 中文个人文档，路由组括号不进 URL，入口仍从 <code>/docs</code> 起</li>
+          <li>日语 N2 学习区：核心词汇语法 + 听力转口语精读</li>
+          <li><code>fumadocs</code> 官方英文参考快照，入口 <code>/docs/fumadocs</code></li>
+        </ul>
+      </article>
+      <article class="pillar">
+        <span class="tag g">Reference · 参考</span>
+        <h3>可校验离线快照</h3>
+        <p>23 篇精选官方文档随镜像构建，正常构建与运行不访问官网。</p>
+        <ul>
+          <li>固定白名单 + SHA-256 清单锁定 <code>third_party/fumadocs/snapshot.json</code></li>
+          <li><code>docs:sync</code> 是唯一联网动作，更新后需人工审阅差异</li>
+          <li><code>docs:check</code> 校验文件、白名单与哈希一致</li>
+        </ul>
+      </article>
+      <article class="pillar">
+        <span class="tag i">Search · 检索</span>
+        <h3>中日英混合分词</h3>
+        <p>本地 <code>mixed-cjk</code> 分词器补足 Orama 内置分词器不切分 CJK 的缺口。</p>
+        <ul>
+          <li>CJK 文本索引为重叠二元组，单字则为一元组</li>
+          <li>拉丁词整体保留；先做 NFKC 归一化并小写</li>
+          <li>兼顾中文、日文语块与英文技术词，不过度放宽</li>
+        </ul>
+      </article>
+      <article class="pillar">
+        <span class="tag v">Deploy · 部署</span>
+        <h3>封存式容器发布</h3>
+        <p>非 root 标准镜像，只读根文件系统，端口仅绑定宿主回环地址。</p>
+        <ul>
+          <li>单一入口 <code>npm run deploy</code> 完成校验、发布、验证、回滚</li>
+          <li>切换后自检失败自动恢复上一镜像</li>
+          <li>Codex 通过 <code>$deploy-fuma-lab</code> Skill 复用同一入口</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- 2. 数据流 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 02</span>
+      <div>
+        <h2>构建时与运行时的分界</h2>
+        <p>所有对上游与工具链的依赖都被推到构建时；运行时只读取已封存进镜像的静态产物。</p>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-col build">
+        <header><span class="dot"></span>构建时 · Build-time</header>
+        <div class="flow-body">
+          <div class="node"><b>MDX 内容 + 参考快照</b><span>content/docs · third_party/fumadocs</span></div>
+          <div class="arrow">↓</div>
+          <div class="node"><b>fumadocs-mdx 编译 · 搜索索引</b><span>lib/source.ts · mixed-cjk tokenizer</span></div>
+          <div class="arrow">↓</div>
+          <div class="node"><b>听力数据与音频切片</b><span>calibrate-subtitles.py → build-listening-exam.mjs</span></div>
+          <div class="arrow">↓</div>
+          <div class="node"><b>next build 标准产物</b><span>verify: lint · docs:check · types:check</span></div>
+        </div>
+      </div>
+      <div class="flow-col run">
+        <header><span class="dot"></span>运行时 · Runtime</header>
+        <div class="flow-body">
+          <div class="node"><b>只读根文件系统容器</b><span>non-root · cap-drop · no-new-privileges</span></div>
+          <div class="arrow">↓</div>
+          <div class="node"><b>静态页面与本地搜索</b><span>/docs · /docs/fumadocs · 站内索引</span></div>
+          <div class="arrow">↓</div>
+          <div class="node"><b>音频按 Range 分发</b><span>public/audio/jlpt-n2 · HTTP 206</span></div>
+          <div class="arrow">↓</div>
+          <div class="node"><b>回环端口发布</b><span>127.0.0.1:${DOCS_PORT}:3000</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="flow-note">运行时对上游文档的网络依赖为 <b>ZERO</b> · 唯一联网动作是显式的 <code>npm run docs:sync</code></p>
+  </section>
+
+  <!-- 3. 内容分类 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 03</span>
+      <div>
+        <h2>内容分类体系</h2>
+        <p>个人根以「专题 → 课次」组织，可扩展；参考根是固定的官方文档子集。路由组 <code>(personal)</code> 只做组织、不出现在地址中。</p>
+      </div>
+    </div>
+    <div class="split">
+      <div class="tree">
+<span class="r">content/docs/</span>
+├─ <span class="m">meta.json</span> <span class="c"># 顶层排序</span>
+├─ <span class="r">(personal)/</span> <span class="c"># 中文 · 不进 URL</span>
+│  └─ <span class="n">japanese-n2/</span>
+│     ├─ <span class="n">core-vocabulary-grammar/</span>
+│     │  ├─ 01–03 <span class="c">词汇 · 32 个核心词</span>
+│     │  └─ 04–06 <span class="c">语法 · 13 个句型</span>
+│     └─ <span class="n">listening-to-speaking/</span>
+│        ├─ 01–03 <span class="c">听力转口语精读</span>
+│        └─ 2024-july <span class="c">听力真题 + 播放器</span>
+└─ <span class="r">fumadocs/</span> <span class="c"># 英文参考快照</span>
+   ├─ ui/ · mdx/ · search/
+   ├─ guides/ · integrations/
+   └─ deploying/ · i18n/ <span class="c"># 共 23 篇</span>
+      </div>
+      <div class="prose">
+        <h4>个人根 · japanese-n2</h4>
+        <p>围绕 JLPT N2 备考组织。核心词汇语法区把 32 个核心词与 13 个语法句型拆到六课；听力转口语区把真题音频作精读，配一个课内听力练习组件。</p>
+        <h4>参考根 · fumadocs</h4>
+        <p>官方文档的 23 篇精选英文快照，覆盖 UI、MDX、搜索、集成、部署与国际化，供离线查阅框架用法。</p>
+        <h4>扩展方式</h4>
+        <p>新增一篇听力转口语笔记走 <code>npm run note:new</code> 脚手架，保证目录约定与页面结构一致；新专题遵循同一「专题 / <code>meta.json</code> / 课次」骨架。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 分词 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 04</span>
+      <div>
+        <h2>混合分词的一次实测</h2>
+        <p>拉丁词整体保留，CJK 连续块切成重叠二元组——既能命中中日文语块，又不像整段匹配那样把结果放得过宽。</p>
+      </div>
+    </div>
+    <div class="token-demo">
+      <div class="token-row">
+        <span class="lbl">输入</span>
+        <span class="src">日本語 N2 文法</span>
+      </div>
+      <div class="token-row">
+        <span class="lbl">CJK 段</span>
+        <div class="chips">
+          <span class="chip cjk">日本</span><span class="chip cjk">本語</span>
+          <span class="chip cjk">文法</span>
+        </div>
+      </div>
+      <div class="token-row">
+        <span class="lbl">拉丁 / 数字</span>
+        <div class="chips">
+          <span class="chip lat">n2</span>
+        </div>
+      </div>
+      <div class="token-row">
+        <span class="lbl">规则</span>
+        <div class="chips">
+          <span class="chip">NFKC 归一化</span><span class="chip">toLowerCase</span>
+          <span class="chip">连续 CJK → 重叠 bigram</span><span class="chip">单字 → unigram</span>
+          <span class="chip">拉丁词整体保留</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 听力数据管线 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 05</span>
+      <div>
+        <h2>听力真题数据管线</h2>
+        <p>把两份不可直接使用的字幕源——保留真实时间轴的粗 ASR 与措辞更好但时间轴另属一版的转写——对齐成可用的整句字幕，再切成练习片段。</p>
+      </div>
+    </div>
+    <div class="split">
+      <div class="prose">
+        <h4>校准 · calibrate-listening-subtitles.py</h4>
+        <p>套用审阅措辞，把短语拼成整句与应答；保留题号与选项为语义单元；仅在日文逗号停顿处按 44 字上限切分长句；以 0.967 相似度对齐两条文本流，用 439 个可靠文本/时间锚点与 1,121 个检测到的停顿，把边界映射回真实录音。</p>
+        <h4>成片 · build-listening-exam.mjs</h4>
+        <p>直接解析并校验标准 SRT；从 342 条源 cue 生成数据与音频，配置边界外的 cue 被排除。</p>
+      </div>
+      <div class="tree" style="line-height:2.05">
+<span class="c"># 输出产物</span>
+<span class="m">lib/data/jlpt-n2-2024-07.json</span>
+  <span class="n">29</span> 个练习片段 · <span class="n">264</span> 条 cue
+<span class="m">public/audio/jlpt-n2/2024-07/*.mp3</span>
+  时长 <span class="n">2,293.8</span> s
+  体积 ≈ <span class="n">22.9</span> MB
+<span class="c"># 运行时</span>
+components/<span class="n">listening-practice.tsx</span>
+  音频按 <span class="r">HTTP Range</span> 请求
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 部署管线 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 06</span>
+      <div>
+        <h2>确定性部署管线</h2>
+        <p><code>npm run deploy</code>（即 <code>scripts/deploy.sh</code>）的八段顺序——每一步是下一步的前提，任一后置检查失败即自动回滚。此处编号即真实执行次序。</p>
+      </div>
+    </div>
+    <div class="pipe">
+      <div class="step guard"><span class="idx">1</span><div><h4>取得独占部署锁</h4><p>跨进程锁，避免并发发布互相踩踏。</p></div></div>
+      <div class="step guard"><span class="idx">2</span><div><h4>校验 Compose 与 Git 空白</h4><p>检查 Compose 配置，以及已暂存/未暂存跟踪改动的空白规范。</p></div></div>
+      <div class="step"><span class="idx">3</span><div><h4>封存当前镜像为回滚点</h4><p>把正在运行的镜像打上带时间戳的回滚标签。</p></div></div>
+      <div class="step"><span class="idx">4</span><div><h4>构建新镜像</h4><p>Docker 构建内部运行 <code>npm run verify</code> 与 <code>npm run build</code>。</p></div></div>
+      <div class="step"><span class="idx">5</span><div><h4>只替换 docs 服务</h4><p>切换容器并等待其健康检查通过。</p></div></div>
+      <div class="step"><span class="idx">6</span><div><h4>确认运行时隔离</h4><p>核对镜像 ID、非 root/只读、已丢弃能力、<code>no-new-privileges</code> 与 PID 上限。</p></div></div>
+      <div class="step"><span class="idx">7</span><div><h4>冒烟测试</h4><p>验证文档根、日语 N2 页、搜索与音频字节范围。</p></div></div>
+      <div class="step guard"><span class="idx">8</span><div><h4>失败自动回滚</h4><p>任一切换后步骤失败，自动恢复并验证上一镜像。</p></div></div>
+    </div>
+  </section>
+
+  <!-- 7. 安全边界 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 07</span>
+      <div>
+        <h2>安全边界（当前基线）</h2>
+        <p>基线刻意最小：只在受信宿主本机可达，把认证与传输安全留给受控代理层。这是一条明确的设计约束，不是遗漏。</p>
+      </div>
+    </div>
+    <div class="sec-panel">
+      <div class="allow">
+        <h4>基线已保证</h4>
+        <ul>
+          <li>容器非 root 运行，根文件系统只读</li>
+          <li>丢弃 Linux 能力，<code>no-new-privileges</code>，限制 PID</li>
+          <li>仅发布 <code>127.0.0.1:${DOCS_PORT}:3000</code></li>
+          <li>凭据永不入库，构建与运行离线</li>
+        </ul>
+      </div>
+      <div class="deny">
+        <h4>基线不含 · 需上层补齐</h4>
+        <ul>
+          <li>身份认证与访问控制</li>
+          <li>TLS 与公网反向代理</li>
+          <li>不得改绑 <code>0.0.0.0</code> 或直接暴露公网</li>
+          <li>远程访问须先在受控代理/私网实现 TLS 与鉴权</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. 未决 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">§ 08</span>
+      <div>
+        <h2>未决的设计取舍</h2>
+        <p>已知边界外、仍待与需求对齐的方向性选择。</p>
+      </div>
+    </div>
+    <div class="open">
+      <div class="qcard"><p class="q">公开访问 vs 私有鉴权部署</p><p class="a">决定是否引入认证层与其形态。</p></div>
+      <div class="qcard"><p class="q">反向代理与 TLS 提供方</p><p class="a">承接远程访问的传输安全与入口。</p></div>
+      <div class="qcard"><p class="q">Git/MDX 唯一 vs 引入 CMS</p><p class="a">未来内容创作是否仍完全走仓库。</p></div>
+      <div class="qcard"><p class="q">混合中英内容是否转全量 i18n 路由</p><p class="a">当前无自动翻译，页面语言声明为 zh-CN。</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="kicker">技术栈 · Stack</div>
+    <div class="stackline">
+      <span>Next.js</span><span>fumadocs-core</span><span>fumadocs-mdx</span><span>fumadocs-ui</span>
+      <span>React</span><span>Node 24.18.0</span><span>Orama search</span><span>oxlint</span>
+      <span>lucide-react</span><span>Docker · Compose v2</span><span>Python · 字幕校准</span>
+    </div>
+    <p class="foot-meta">FUMA LAB · 设计方案资料 · 依据 README / CLAUDE.md / docs/reviews 归纳 · 2026-07-05</p>
+  </footer>
+
+</div>
