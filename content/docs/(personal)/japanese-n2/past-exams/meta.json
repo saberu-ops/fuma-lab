@@ -1,0 +1,7 @@
+{
+  "title": "历年真题",
+  "description": "按考试年月管理 N2 真题与学习材料",
+  "icon": "Archive",
+  "defaultOpen": true,
+  "pages": ["index", "..."]
+}

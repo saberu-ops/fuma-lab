@@ -55,9 +55,9 @@ DOCS_PORT=3100 SITE_URL=http://127.0.0.1:3100 \
 
 - `content/docs/(personal)`：本项目维护的中文个人文档，URL 仍从 `/docs`
   开始，括号目录不会出现在路由中。
-- `content/docs/(personal)/japanese-n2`：按专题和课次维护的日语 N2
-  学习笔记，包含听力转口语精读，以及 32 个核心词汇和 13 个语法句型；
-  入口为 `/docs/japanese-n2`。
+- `content/docs/(personal)/japanese-n2`：日语 N2 真题与专项资料。历年真题按
+  `考试年月 → 科目` 归档，专项内容按 `专题 → 课次` 维护；入口为
+  `/docs/japanese-n2`。
 - `content/docs/fumadocs`：23 篇精选官方英文文档的本地快照，入口为
   `/docs/fumadocs`。
 
