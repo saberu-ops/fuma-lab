@@ -1,0 +1,13 @@
+[Unit]
+Description=GitHub Actions runner for saberu-ops/fuma-lab
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/spartan/actions-runner
+ExecStart=/home/spartan/actions-runner/run.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

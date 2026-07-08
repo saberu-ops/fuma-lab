@@ -1,0 +1,64 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  require-staging:
+    name: Require staging success
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Require successful staging deployment for this commit
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/check-staging-deployment.mjs
+
+  deploy:
+    name: Deploy production
+    needs: require-staging
+    runs-on:
+      - self-hosted
+      - fuma-lab
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_SITE_URL }}
+    env:
+      PRODUCTION_SITE_URL: ${{ vars.PRODUCTION_SITE_URL }}
+      PRODUCTION_DOCS_PORT: ${{ vars.PRODUCTION_DOCS_PORT || '3000' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create production env file
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${PRODUCTION_SITE_URL}" ]]; then
+            echo "PRODUCTION_SITE_URL is required for production deployment" >&2
+            exit 1
+          fi
+          umask 077
+          mkdir -p envs
+          {
+            printf 'COMPOSE_PROJECT_NAME=fuma-lab\n'
+            printf 'DOCS_IMAGE=fuma-lab:prod\n'
+            printf 'SITE_URL=%s\n' "${PRODUCTION_SITE_URL}"
+            printf 'DOCS_PORT=%s\n' "${PRODUCTION_DOCS_PORT}"
+          } > envs/production.env
+
+      - name: Deploy production
+        run: bash scripts/deploy.sh --env production

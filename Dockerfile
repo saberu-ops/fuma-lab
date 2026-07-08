@@ -13,6 +13,10 @@ RUN npm ci
 FROM base AS builder
 ARG SITE_URL=http://localhost:3000
 ENV SITE_URL=${SITE_URL}
+# Non-production builds set ROBOTS_NOINDEX=1 so next.config bakes the
+# X-Robots-Tag: noindex header. Empty by default (production is indexable).
+ARG ROBOTS_NOINDEX=
+ENV ROBOTS_NOINDEX=${ROBOTS_NOINDEX}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run verify && npm run build

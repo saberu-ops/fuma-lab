@@ -18,7 +18,10 @@
     "audio:build": "node scripts/build-listening-exam.mjs",
     "note:new": "node scripts/new-japanese-note.mjs",
     "deploy": "bash scripts/deploy.sh",
+    "deploy:prod": "bash scripts/deploy.sh --env production",
+    "deploy:stg": "bash scripts/deploy.sh --env staging",
     "deploy:check": "bash scripts/deploy.sh --check-only",
+    "deploy:stg:check": "bash scripts/deploy.sh --env staging --check-only",
     "docs:sync": "node scripts/sync-fumadocs-reference.mjs",
     "docs:check": "node scripts/sync-fumadocs-reference.mjs --check"
   },

@@ -12,6 +12,7 @@ docs/reviews
 .env.*
 !.env.example
 *.log
+Screenshot*.png
 Dockerfile
 compose.yaml
 CLAUDE.md

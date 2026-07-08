@@ -6,37 +6,43 @@ readonly SCRIPT_DIRECTORY="$(
   cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P
 )"
 readonly REPOSITORY_ROOT="$(cd -- "$SCRIPT_DIRECTORY/.." && pwd -P)"
-readonly SERVICE="${DEPLOY_SERVICE:-docs}"
-readonly IMAGE="${DEPLOY_IMAGE:-fuma-lab:local}"
-readonly BASE_URL="${DEPLOY_BASE_URL:-http://127.0.0.1:${DOCS_PORT:-3000}}"
-readonly HEALTH_TIMEOUT="${DEPLOY_HEALTH_TIMEOUT:-90}"
-readonly PULL_BASE_IMAGE="${DEPLOY_PULL:-1}"
-readonly SMOKE_MARKER="${DEPLOY_SMOKE_MARKER:-个人文档}"
 
+target_environment="production"
 check_only=0
 switched=0
 rollback_tag=""
 candidate_tag=""
+release_tag=""
 temporary_directory=""
+new_image_id=""
+
+SERVICE=""
+IMAGE=""
+BASE_URL=""
+HEALTH_TIMEOUT=""
+PULL_BASE_IMAGE=""
+SMOKE_MARKER=""
 
 cd -- "$REPOSITORY_ROOT"
 
 usage() {
   cat <<'EOF'
-Usage: scripts/deploy.sh [--check-only]
+Usage: scripts/deploy.sh [--env production|staging] [--check-only]
 
 Build and validate the Fuma Lab image, preserve the running image, replace the
 Compose service, verify health and application endpoints, and automatically
 roll back if a post-switch check fails.
 
 Options:
+  --env NAME    Target environment: production (default) or staging.
   --check-only  Build and validate the image without replacing the container.
   -h, --help    Show this help.
 
 Environment:
+  DEPLOY_ENV_FILE      Override the environment file loaded for --env.
   DEPLOY_BASE_URL        Smoke-test origin (default: http://127.0.0.1:$DOCS_PORT)
   DEPLOY_HEALTH_TIMEOUT  Health-check timeout in seconds (default: 90)
-  DEPLOY_IMAGE           Compose image tag (default: fuma-lab:local)
+  DEPLOY_IMAGE           Compose image tag (default: environment DOCS_IMAGE)
   DEPLOY_PULL            Set to 0 to skip pulling base images (default: 1)
   DEPLOY_SERVICE         Compose service name (default: docs)
   DEPLOY_SMOKE_MARKER    Text expected on /docs (default: 个人文档)
@@ -55,6 +61,81 @@ fail() {
 require_command() {
   command -v "$1" >/dev/null 2>&1 ||
     fail "Required command is unavailable: $1"
+}
+
+source_env_file() {
+  local file="$1"
+  local required="$2"
+
+  if [[ -f "$file" ]]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$file"
+    set +a
+  elif [[ "$required" == "1" ]]; then
+    fail "$file not found"
+  fi
+}
+
+compose_profile_enabled() {
+  local profile="$1"
+  local raw_profiles="${COMPOSE_PROFILES:-}"
+  local profiles=",${raw_profiles//[[:space:]]/},"
+
+  [[ "$profiles" == *",$profile,"* ]]
+}
+
+load_environment() {
+  local env_file
+
+  case "$target_environment" in
+    production)
+      env_file="${DEPLOY_ENV_FILE:-envs/production.env}"
+      source_env_file "$env_file" 0
+      export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-fuma-lab}"
+      export DOCS_PORT="${DOCS_PORT:-3000}"
+      export DOCS_IMAGE="${DOCS_IMAGE:-fuma-lab:prod}"
+      export SITE_URL="${SITE_URL:-http://localhost:${DOCS_PORT}}"
+      export ROBOTS_NOINDEX="${ROBOTS_NOINDEX:-}"
+
+      [[ "$COMPOSE_PROJECT_NAME" == "fuma-lab" ]] ||
+        fail "Production COMPOSE_PROJECT_NAME must be fuma-lab"
+      [[ "$ROBOTS_NOINDEX" != "1" ]] ||
+        fail "Production must not set ROBOTS_NOINDEX=1"
+      [[ "$SITE_URL" != *"your-production-domain.example"* ]] ||
+        fail "Production SITE_URL is still the placeholder"
+      ;;
+    staging)
+      env_file="${DEPLOY_ENV_FILE:-envs/staging.env}"
+      source_env_file "$env_file" 1
+      export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-fuma-lab-stg}"
+      export DOCS_PORT="${DOCS_PORT:-3001}"
+      export DOCS_IMAGE="${DOCS_IMAGE:-fuma-lab:stg}"
+      export ROBOTS_NOINDEX="${ROBOTS_NOINDEX:-1}"
+
+      [[ "$COMPOSE_PROJECT_NAME" == "fuma-lab-stg" ]] ||
+        fail "Staging COMPOSE_PROJECT_NAME must be fuma-lab-stg"
+      [[ "$ROBOTS_NOINDEX" == "1" ]] ||
+        fail "Staging must set ROBOTS_NOINDEX=1"
+      [[ -n "${SITE_URL:-}" && "$SITE_URL" != http://localhost* ]] ||
+        fail "Staging SITE_URL must be a non-localhost URL"
+
+      if [[ "$check_only" -eq 0 ]] && compose_profile_enabled "tunnel"; then
+        [[ -n "${TUNNEL_TOKEN:-}" && "$TUNNEL_TOKEN" != "replace-with-staging-tunnel-token" ]] ||
+          fail "Staging TUNNEL_TOKEN is unset or still the placeholder"
+      fi
+      ;;
+    *)
+      fail "Unsupported environment: $target_environment"
+      ;;
+  esac
+
+  SERVICE="${DEPLOY_SERVICE:-docs}"
+  IMAGE="${DEPLOY_IMAGE:-$DOCS_IMAGE}"
+  BASE_URL="${DEPLOY_BASE_URL:-http://127.0.0.1:${DOCS_PORT}}"
+  HEALTH_TIMEOUT="${DEPLOY_HEALTH_TIMEOUT:-90}"
+  PULL_BASE_IMAGE="${DEPLOY_PULL:-1}"
+  SMOKE_MARKER="${DEPLOY_SMOKE_MARKER:-个人文档}"
 }
 
 container_id() {
@@ -117,9 +198,23 @@ smoke_test() {
 
   log "Checking documentation root"
   curl --fail --silent --show-error --retry 3 --retry-connrefused \
+    --dump-header "$header_file" \
     "$BASE_URL/docs" --output "$response_file"
   grep -Fq "$SMOKE_MARKER" "$response_file" ||
     fail "Documentation root did not contain the expected navigation"
+
+  if [[ "${ROBOTS_NOINDEX:-}" == "1" ]]; then
+    grep -Eiq '^X-Robots-Tag:[[:space:]]*.*noindex' "$header_file" ||
+      fail "Expected X-Robots-Tag noindex header is missing"
+  else
+    ! grep -Eiq '^X-Robots-Tag:[[:space:]]*.*noindex' "$header_file" ||
+      fail "Unexpected noindex header on a production-indexable build"
+  fi
+
+  if [[ "$target_environment" == "staging" ]]; then
+    grep -Fq "$SITE_URL" "$response_file" ||
+      fail "Documentation root did not include the staging SITE_URL"
+  fi
 
   if [[ -f "content/docs/(personal)/japanese-n2/index.mdx" ]]; then
     log "Checking Japanese N2 section and search"
@@ -177,6 +272,13 @@ verify_runtime() {
     fail "Runtime does not enforce no-new-privileges"
 }
 
+ensure_environment_services() {
+  if [[ "$target_environment" == "staging" ]] && compose_profile_enabled "tunnel"; then
+    log "Ensuring staging tunnel service is running"
+    docker compose up -d --no-build cloudflared
+  fi
+}
+
 restore_previous_image() {
   local original_exit_code="$1"
 
@@ -203,8 +305,16 @@ restore_previous_image() {
   exit "$original_exit_code"
 }
 
-for argument in "$@"; do
-  case "$argument" in
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --env)
+      shift
+      [[ -n "${1:-}" ]] || fail "--env requires production or staging"
+      target_environment="$1"
+      ;;
+    --env=*)
+      target_environment="${1#--env=}"
+      ;;
     --check-only)
       check_only=1
       ;;
@@ -213,12 +323,15 @@ for argument in "$@"; do
       exit 0
       ;;
     *)
-      printf '[deploy] ERROR: Unknown argument: %s\n' "$argument" >&2
+      printf '[deploy] ERROR: Unknown argument: %s\n' "$1" >&2
       usage >&2
       exit 2
       ;;
   esac
+  shift
 done
+
+load_environment
 
 [[ "$HEALTH_TIMEOUT" =~ ^[1-9][0-9]*$ ]] ||
   fail "DEPLOY_HEALTH_TIMEOUT must be a positive integer"
@@ -258,11 +371,12 @@ if [[ "${IMAGE##*/}" == *:* ]]; then
 fi
 rollback_repository="${DEPLOY_ROLLBACK_REPOSITORY:-$image_repository}"
 release_timestamp="$(date +%Y%m%d-%H%M%S)"
+git_revision="$(git rev-parse --short=12 HEAD)"
 current_container="$(container_id)"
 
 if [[ -n "$current_container" && "$check_only" -eq 0 ]]; then
   previous_image_id="$(docker inspect --format '{{.Image}}' "$current_container")"
-  rollback_tag="${rollback_repository}:rollback-${release_timestamp}"
+  rollback_tag="${rollback_repository}:${target_environment}-rollback-${release_timestamp}"
   preserve_container_image \
     "$current_container" "$previous_image_id" "$rollback_tag"
   log "Preserved running image as $rollback_tag"
@@ -276,7 +390,7 @@ if [[ "$PULL_BASE_IMAGE" == "1" ]]; then
 fi
 
 if [[ "$check_only" -eq 1 ]]; then
-  candidate_tag="${rollback_repository}:candidate-${release_timestamp}"
+  candidate_tag="${rollback_repository}:${target_environment}-candidate-${release_timestamp}"
   compose_override="$temporary_directory/check.compose.yaml"
   printf 'services:\n  %s:\n    image: %s\n' \
     "$SERVICE" "$candidate_tag" >"$compose_override"
@@ -290,6 +404,8 @@ else
   log "Building and validating image $IMAGE"
   docker compose build "${build_arguments[@]}" "$SERVICE"
   new_image_id="$(docker image inspect --format '{{.Id}}' "$IMAGE")"
+  release_tag="${rollback_repository}:${target_environment}-${git_revision}-${release_timestamp}"
+  docker tag "$new_image_id" "$release_tag"
 fi
 log "Validated image: $new_image_id"
 
@@ -307,6 +423,7 @@ log "Replacing Compose service $SERVICE"
 docker compose up -d --no-build --force-recreate "$SERVICE"
 wait_for_healthy
 verify_runtime
+ensure_environment_services
 smoke_test
 switched=0
 
@@ -319,7 +436,9 @@ rm -rf "$temporary_directory"
 trap - ERR INT TERM
 
 log "Deployment succeeded"
+printf 'ENVIRONMENT=%s\n' "$target_environment"
 printf 'DEPLOYED_IMAGE=%s\n' "$new_image_id"
+printf 'RELEASE_TAG=%s\n' "${release_tag:-none}"
 printf 'ROLLBACK_TAG=%s\n' "${rollback_tag:-none}"
 printf 'SERVICE_HEALTH=healthy\n'
 printf 'WORKING_TREE=%s\n' "$working_tree"

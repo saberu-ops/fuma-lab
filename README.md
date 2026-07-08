@@ -10,9 +10,10 @@
 - 容器以非 root 用户运行，根文件系统只读，端口只绑定宿主机回环地址。
 - 提供本地开发、快照完整性校验和受控的官网快照更新脚本。
 
-## Docker 快速开始
+## Docker 本地沙箱
 
-要求 Docker Engine 和 Compose v2 插件。Docker 部署不要求宿主机安装 Node.js。
+要求 Docker Engine 和 Compose v2 插件。裸 `docker compose` 默认启动本地
+沙箱：project 为 `fuma-lab-local`，镜像为 `fuma-lab:local`，端口为 `3009`。
 
 ```bash
 docker compose config --quiet
@@ -20,7 +21,7 @@ docker compose up -d --build
 docker compose ps
 ```
 
-打开 <http://127.0.0.1:3000/docs>。正常状态应显示服务为 `healthy`。
+打开 <http://127.0.0.1:3009/docs>。正常状态应显示服务为 `healthy`。
 
 查看日志或停止服务：
 
@@ -36,8 +37,9 @@ docker compose down
 
 | 变量 | 默认值 | 用途 | 何时生效 |
 | --- | --- | --- | --- |
-| `DOCS_PORT` | `3000` | 宿主机回环地址上的监听端口 | 重建容器 |
-| `SITE_URL` | `http://localhost:3000` | 生成页面和 OG 元数据使用的公开基址 | 重新构建镜像 |
+| `DOCS_IMAGE` | 本地 `fuma-lab:local`；生产 `fuma-lab:prod` | Compose 使用的镜像 tag | 重新构建并创建容器 |
+| `DOCS_PORT` | 本地 `3009`；生产 `3000` | 宿主机回环地址上的监听端口 | 重建容器 |
+| `SITE_URL` | 本地 `http://localhost:3000` | 生成页面和 OG 元数据使用的公开基址 | 重新构建镜像 |
 
 修改端口时应同时提供与访问地址一致的 `SITE_URL`：
 
@@ -149,7 +151,9 @@ docker compose config --quiet
 | `scripts` | 快照同步与完整性校验工具 |
 | `third_party/fumadocs` | 上游许可证、声明和快照清单 |
 | `Dockerfile`、`compose.yaml` | 不可变镜像和受限容器配置 |
+| `docs/architecture` | 跨功能架构方案和决策记录 |
 | `docs/features/fumadocs` | 运维运行手册 |
+| `docs/features/fumadocs/release-automation.md` | GitHub Actions 部署自动化设置指南 |
 | `docs/reviews` | 实施计划和变更记录 |
 
 ## 安全边界

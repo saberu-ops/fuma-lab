@@ -4,10 +4,18 @@
 
 - Treat `docs/features/fumadocs/operations.md` as the operational source of
   truth.
+- Use `docs/architecture/` for cross-cutting architecture proposals, ADR-style
+  decisions, governance models, and architecture reviews. Do not force these
+  materials under `docs/features/` unless they document an implemented feature
+  or operational capability.
+- Use `docs/features/` for implemented feature guides and current operational
+  runbooks. Future-state architecture belongs in `docs/architecture/` until it
+  is implemented and promoted into the runbook.
 - Use `npm run verify` for changes that will not be deployed. Do not run it
   separately when `npm run deploy` will perform the same checks in Docker.
 - Add a round changelog under `docs/reviews/` for code or application
-  configuration changes.
+  configuration changes. Do not use `docs/reviews/` for standalone architecture
+  notes unless they accompany an implementation round.
 - Do not run `npm run docs:sync` unless the user explicitly asks to refresh the
   upstream Fumadocs snapshot.
 

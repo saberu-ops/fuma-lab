@@ -24,6 +24,9 @@ __pycache__/
 .env.*
 !.env.example
 !.env.*.example
+# Per-environment files under envs/ (may hold tunnel tokens); keep only templates
+/envs/*.env
+!/envs/*.env.example
 *.pem
 *.key
 *.crt
