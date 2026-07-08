@@ -1,0 +1,38 @@
+import type { MetadataRoute } from 'next';
+
+// Web App Manifest — enables the browser "Install" action (PWA).
+// Next.js serves this at /manifest.webmanifest and injects the
+// <link rel="manifest"> tag automatically.
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'Fuma Lab',
+    short_name: 'Fuma Lab',
+    description: '个人文档与 JLPT N2 学习站',
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    background_color: '#ffffff',
+    theme_color: '#0a0a0a',
+    lang: 'zh-CN',
+    icons: [
+      {
+        src: '/icons/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-maskable-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+  };
+}
