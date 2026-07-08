@@ -1,7 +1,16 @@
 {
   "title": "日语 N2",
-  "description": "日语 N2 学习与输出训练",
+  "description": "历年真题资料库与专项学习",
   "icon": "Languages",
   "defaultOpen": true,
-  "pages": ["index", "listening-to-speaking", "core-vocabulary-grammar", "..."]
+  "pages": [
+    "index",
+    "past-exams",
+    "---专项学习---",
+    "listening-to-speaking",
+    "core-vocabulary-grammar",
+    "---项目规划---",
+    "roadmap",
+    "..."
+  ]
 }

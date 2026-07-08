@@ -35,13 +35,14 @@ type ExamSection = {
 };
 
 type Exam = {
-  title: string;
-  description: string;
   sections: ExamSection[];
 };
 
 const exam = examData as Exam;
 const rates = [0.75, 1, 1.25, 1.5];
+const allClips = exam.sections.flatMap((item) =>
+  item.clips.map((clip) => ({ sectionId: item.id, clip })),
+);
 
 function formatTime(value: number) {
   if (!Number.isFinite(value)) return '0:00';
@@ -92,10 +93,7 @@ export function ListeningPractice() {
     (cue) => currentTime >= cue.start && currentTime < cue.end,
   );
   const activeCue = clip.cues[activeCueIndex];
-  const allClips = exam.sections.flatMap((item) => item.clips);
-  const completedCount = allClips.filter((item) =>
-    completed.has(item.id),
-  ).length;
+  const clipIndex = allClips.findIndex((item) => item.clip.id === clip.id);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -123,6 +121,13 @@ export function ListeningPractice() {
   function chooseSection(nextSection: ExamSection) {
     setSectionId(nextSection.id);
     setClipId(nextSection.clips[0].id);
+  }
+
+  function chooseClipAt(index: number) {
+    const next = allClips[index];
+    if (!next) return;
+    setSectionId(next.sectionId);
+    setClipId(next.clip.id);
   }
 
   async function togglePlayback() {
@@ -183,7 +188,7 @@ export function ListeningPractice() {
 
   return (
     <div
-      className="not-prose my-8 overflow-hidden rounded-2xl border bg-fd-card text-fd-card-foreground shadow-sm outline-none"
+      className="not-prose overflow-hidden rounded-2xl border bg-fd-card text-fd-card-foreground shadow-sm outline-none lg:h-full lg:min-h-0"
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
@@ -200,29 +205,9 @@ export function ListeningPractice() {
         您的浏览器不支持音频播放。
       </audio>
 
-      <div className="border-b bg-gradient-to-br from-fd-primary/10 via-fd-card to-fd-card px-4 py-5 sm:px-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="mb-1 text-xs font-semibold tracking-[0.18em] text-fd-primary uppercase">
-              N2 Listening Lab
-            </p>
-            <h2 className="m-0 text-xl font-semibold tracking-tight">
-              {exam.title}
-            </h2>
-            <p className="mt-1.5 mb-0 text-sm text-fd-muted-foreground">
-              {exam.description}
-            </p>
-          </div>
-          <div className="rounded-full border bg-fd-background/70 px-3 py-1.5 text-xs text-fd-muted-foreground">
-            已练习 <strong className="text-fd-foreground">{completedCount}</strong>{' '}
-            / {allClips.length}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]">
-        <div className="min-w-0 border-b p-4 sm:p-6 lg:border-r lg:border-b-0">
-          <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+      <div className="grid lg:h-full lg:grid-cols-2">
+        <div className="flex min-w-0 flex-col border-b p-3 sm:p-4 lg:min-h-0 lg:border-r lg:border-b-0">
+          <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
             {exam.sections.map((item) => (
               <button
                 key={item.id}
@@ -239,7 +224,7 @@ export function ListeningPractice() {
             ))}
           </div>
 
-          <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
+          <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
             {section.clips.map((item) => (
               <button
                 key={item.id}
@@ -262,8 +247,8 @@ export function ListeningPractice() {
             ))}
           </div>
 
-          <div className="rounded-2xl border bg-fd-background p-4 sm:p-5">
-            <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="flex min-h-0 flex-1 flex-col rounded-xl border bg-fd-background p-3 sm:p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <p className="m-0 text-xs text-fd-muted-foreground">
                   問題 {section.id} · {section.translatedTitle || section.title}
@@ -277,124 +262,135 @@ export function ListeningPractice() {
               </span>
             </div>
 
-            <div className="mb-5 flex min-h-24 items-center justify-center rounded-xl bg-fd-muted/55 px-5 py-6 text-center">
-              {showTranscript ? (
-                <p
-                  className="m-0 whitespace-pre-line text-lg leading-8 font-medium"
-                  lang="ja"
+            <div className="flex flex-1 flex-col justify-center py-2">
+              <div className="mb-2 flex items-center gap-3 font-mono text-xs text-fd-muted-foreground">
+                <span className="w-9 text-right">{formatTime(currentTime)}</span>
+                <input
+                  aria-label="播放进度"
+                  className="h-1.5 min-w-0 flex-1 cursor-pointer accent-fd-primary"
+                  max={duration || clip.duration}
+                  min="0"
+                  onChange={(event) => seek(Number(event.target.value))}
+                  step="0.05"
+                  type="range"
+                  value={Math.min(currentTime, duration || clip.duration)}
+                />
+                <span className="w-9">
+                  {formatTime(duration || clip.duration)}
+                </span>
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                <button
+                  aria-label="后退 5 秒"
+                  className="flex size-10 items-center justify-center rounded-full border bg-fd-card transition hover:bg-fd-muted"
+                  onClick={() => seek(currentTime - 5)}
+                  type="button"
                 >
-                  {activeCue?.text ?? '播放音频后，字幕会在这里同步显示。'}
-                </p>
-              ) : (
-                <div>
-                  <p className="m-0 text-sm font-medium">盲听模式</p>
-                  <p className="mt-1 mb-0 text-xs text-fd-muted-foreground">
-                    字幕已隐藏，点击“显示字幕”即可恢复。
-                  </p>
+                  <ControlIcon label="后退 5 秒">↶</ControlIcon>
+                  <span className="sr-only">后退 5 秒</span>
+                </button>
+                <button
+                  aria-label={isPlaying ? '暂停' : '播放'}
+                  className="flex size-12 items-center justify-center rounded-full bg-fd-primary text-xl text-fd-primary-foreground shadow-sm transition hover:opacity-90"
+                  onClick={() => void togglePlayback()}
+                  type="button"
+                >
+                  <ControlIcon label={isPlaying ? '暂停' : '播放'}>
+                    {isPlaying ? 'Ⅱ' : '▶'}
+                  </ControlIcon>
+                  <span className="sr-only">
+                    {isPlaying ? '暂停' : '播放'}
+                  </span>
+                </button>
+                <button
+                  aria-label="前进 5 秒"
+                  className="flex size-10 items-center justify-center rounded-full border bg-fd-card transition hover:bg-fd-muted"
+                  onClick={() => seek(currentTime + 5)}
+                  type="button"
+                >
+                  <ControlIcon label="前进 5 秒">↷</ControlIcon>
+                  <span className="sr-only">前进 5 秒</span>
+                </button>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2 border-t pt-3">
+                <button
+                  aria-pressed={showTranscript}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                    showTranscript
+                      ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
+                      : 'bg-fd-card hover:bg-fd-muted'
+                  }`}
+                  onClick={() => setShowTranscript((current) => !current)}
+                  type="button"
+                >
+                  {showTranscript ? '隐藏字幕' : '显示字幕'}
+                </button>
+                <button
+                  aria-pressed={repeatCue}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                    repeatCue
+                      ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
+                      : 'bg-fd-card hover:bg-fd-muted'
+                  }`}
+                  disabled={!activeCue}
+                  onClick={() => setRepeatCue((current) => !current)}
+                  type="button"
+                >
+                  {repeatCue ? '逐句循环中' : '逐句循环'}
+                </button>
+                <div className="flex items-center gap-1 rounded-lg border bg-fd-card p-1">
+                  {rates.map((item) => (
+                    <button
+                      key={item}
+                      aria-label={`${item} 倍速`}
+                      className={`rounded-md px-2 py-1 text-xs transition ${
+                        rate === item
+                          ? 'bg-fd-muted font-semibold text-fd-foreground'
+                          : 'text-fd-muted-foreground hover:text-fd-foreground'
+                      }`}
+                      onClick={() => handleRate(item)}
+                      type="button"
+                    >
+                      {item}×
+                    </button>
+                  ))}
                 </div>
-              )}
-            </div>
-
-            <div className="mb-2 flex items-center gap-3 font-mono text-xs text-fd-muted-foreground">
-              <span className="w-9 text-right">{formatTime(currentTime)}</span>
-              <input
-                aria-label="播放进度"
-                className="h-1.5 min-w-0 flex-1 cursor-pointer accent-fd-primary"
-                max={duration || clip.duration}
-                min="0"
-                onChange={(event) => seek(Number(event.target.value))}
-                step="0.05"
-                type="range"
-                value={Math.min(currentTime, duration || clip.duration)}
-              />
-              <span className="w-9">{formatTime(duration || clip.duration)}</span>
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button
-                aria-label="后退 5 秒"
-                className="flex size-10 items-center justify-center rounded-full border bg-fd-card transition hover:bg-fd-muted"
-                onClick={() => seek(currentTime - 5)}
-                type="button"
-              >
-                <ControlIcon label="后退 5 秒">↶</ControlIcon>
-                <span className="sr-only">后退 5 秒</span>
-              </button>
-              <button
-                aria-label={isPlaying ? '暂停' : '播放'}
-                className="flex size-12 items-center justify-center rounded-full bg-fd-primary text-xl text-fd-primary-foreground shadow-sm transition hover:opacity-90"
-                onClick={() => void togglePlayback()}
-                type="button"
-              >
-                <ControlIcon label={isPlaying ? '暂停' : '播放'}>
-                  {isPlaying ? 'Ⅱ' : '▶'}
-                </ControlIcon>
-                <span className="sr-only">{isPlaying ? '暂停' : '播放'}</span>
-              </button>
-              <button
-                aria-label="前进 5 秒"
-                className="flex size-10 items-center justify-center rounded-full border bg-fd-card transition hover:bg-fd-muted"
-                onClick={() => seek(currentTime + 5)}
-                type="button"
-              >
-                <ControlIcon label="前进 5 秒">↷</ControlIcon>
-                <span className="sr-only">前进 5 秒</span>
-              </button>
-            </div>
-
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 border-t pt-4">
-              <button
-                aria-pressed={showTranscript}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
-                  showTranscript
-                    ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
-                    : 'bg-fd-card hover:bg-fd-muted'
-                }`}
-                onClick={() => setShowTranscript((current) => !current)}
-                type="button"
-              >
-                {showTranscript ? '隐藏字幕' : '显示字幕'}
-              </button>
-              <button
-                aria-pressed={repeatCue}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
-                  repeatCue
-                    ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
-                    : 'bg-fd-card hover:bg-fd-muted'
-                }`}
-                disabled={!activeCue}
-                onClick={() => setRepeatCue((current) => !current)}
-                type="button"
-              >
-                {repeatCue ? '逐句循环中' : '逐句循环'}
-              </button>
-              <div className="flex items-center gap-1 rounded-lg border bg-fd-card p-1">
-                {rates.map((item) => (
-                  <button
-                    key={item}
-                    aria-label={`${item} 倍速`}
-                    className={`rounded-md px-2 py-1 text-xs transition ${
-                      rate === item
-                        ? 'bg-fd-muted font-semibold text-fd-foreground'
-                        : 'text-fd-muted-foreground hover:text-fd-foreground'
-                    }`}
-                    onClick={() => handleRate(item)}
-                    type="button"
-                  >
-                    {item}×
-                  </button>
-                ))}
               </div>
             </div>
-          </div>
 
-          <p className="mt-3 mb-0 text-center text-[11px] text-fd-muted-foreground">
-            键盘：空格播放 / 暂停，← → 前后跳转 5 秒
-          </p>
+            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-t pt-3">
+              <button
+                className="rounded-lg border bg-fd-card px-3 py-2 text-xs font-medium transition hover:bg-fd-muted disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={clipIndex <= 0}
+                onClick={() => chooseClipAt(clipIndex - 1)}
+                type="button"
+              >
+                ← 上一题
+              </button>
+              <div className="min-w-0 text-center">
+                <p className="m-0 text-xs font-semibold">
+                  第 {clipIndex + 1} / {allClips.length} 题
+                </p>
+                <p className="mt-0.5 mb-0 hidden text-[11px] text-fd-muted-foreground xl:block">
+                  空格播放 · ← → 前后跳转 5 秒
+                </p>
+              </div>
+              <button
+                className="rounded-lg border bg-fd-card px-3 py-2 text-xs font-medium transition hover:bg-fd-muted disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={clipIndex >= allClips.length - 1}
+                onClick={() => chooseClipAt(clipIndex + 1)}
+                type="button"
+              >
+                下一题 →
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="flex min-h-0 flex-col p-4 sm:p-6">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="flex min-w-0 flex-col p-3 sm:p-4 lg:min-h-0">
+          <div className="mb-2 flex items-center justify-between">
             <div>
               <h3 className="m-0 text-sm font-semibold">逐句字幕</h3>
               <p className="mt-0.5 mb-0 text-xs text-fd-muted-foreground">
@@ -409,7 +405,7 @@ export function ListeningPractice() {
           {showTranscript ? (
             <div
               ref={transcriptRef}
-              className="max-h-[34rem] space-y-1 overflow-y-auto rounded-xl border bg-fd-background p-2 lg:max-h-[42rem]"
+              className="h-72 space-y-1 overflow-y-auto rounded-xl border bg-fd-background p-2 lg:h-auto lg:min-h-0 lg:flex-1"
             >
               {clip.cues.map((cue, index) => {
                 const active = index === activeCueIndex;
@@ -440,7 +436,7 @@ export function ListeningPractice() {
             </div>
           ) : (
             <button
-              className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-xl border border-dashed bg-fd-muted/25 text-sm transition hover:bg-fd-muted/50"
+              className="flex h-72 flex-col items-center justify-center rounded-xl border border-dashed bg-fd-muted/25 text-sm transition hover:bg-fd-muted/50 lg:h-auto lg:min-h-0 lg:flex-1"
               onClick={() => setShowTranscript(true)}
               type="button"
             >
