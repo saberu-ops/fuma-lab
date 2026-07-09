@@ -84,6 +84,15 @@ After the GitHub self-hosted runner and staging variables are configured, pushin
 to the `stg` branch runs the same deployment path automatically through the
 `Deploy Staging` workflow.
 
+The current staging handoff record is
+[`release-handoff-2026-07-09.md`](release-handoff-2026-07-09.md). It records
+the successful `stg` deployment, GitHub Actions evidence, and browser
+verification for commit `4e2ae53865e138bc166429e4e263d803e7e60960`.
+
+Agent-operated deployment stops at `stg`. Promotion from `stg` to `main` or
+`master` must be done through a pull request; do not direct-push production
+branches.
+
 ## Verifying it works
 
 - `curl -sI http://127.0.0.1:3001/docs` → `200` and `X-Robots-Tag: noindex`.

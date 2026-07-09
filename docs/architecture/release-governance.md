@@ -9,7 +9,7 @@
 建立一条可审计、可回滚、可扩展的发布路径：
 
 ```text
-local/dev -> stg branch -> staging environment -> production branch -> production
+local/dev -> stg branch -> staging environment -> PR -> production branch -> production
 ```
 
 The original target name for the production branch was `master`; this repository
@@ -51,21 +51,22 @@ renamed.
 推荐主线：
 
 ```text
-feature/* -> stg -> main
+feature/* -> stg -> PR -> main
 ```
 
 - `feature/*`：功能开发和本地验证。可以使用 `npm run verify`、
   `npm run deploy:check` 或本地 compose 沙箱，但不得直接代表 staging。
 - `stg`：预发布分支。合并后自动构建不可变镜像并部署到 staging。
-- `main`：生产发布分支。只有 staging 验收通过的提交才允许进入。
+- `main`：生产发布分支。只有 staging 验收通过且通过 PR review 的提交才允许
+  进入。agent 不直接 push `main` 或 `master`。
 
-如果未来需要更严格的控制，可以把 `stg -> main` 改为 release PR：
+如果未来需要更严格的控制，可以把 PR source 从 `stg` 改为显式 release 分支：
 
 ```text
-feature/* -> stg -> release/<date-or-version> -> main
+feature/* -> stg -> release/<date-or-version> -> PR -> main
 ```
 
-当前规模下不建议过早引入 release 分支，除非出现并行发布或热修复冲突。
+当前规模下可以先使用 `stg -> main` PR，但不能直接 push 生产分支。
 
 ## 5. 发布物模型
 

@@ -175,15 +175,22 @@ Use this flow for a normal release:
 1. Merge or fast-forward the intended release commit into `stg`.
 2. Wait for `CI` and `Deploy Staging` to succeed.
 3. Open the staging URL and complete the product acceptance checklist.
-4. Promote the same commit SHA to `main`.
-5. Wait for `Deploy Production`.
-6. If the production Environment requires approval, approve only after checking
+4. Open a pull request from `stg` to the production branch (`main` today,
+   `master` only if the repository is renamed).
+5. Merge only after review and required checks pass.
+6. Wait for `Deploy Production` after the PR merge updates the production
+   branch.
+7. If the production Environment requires approval, approve only after checking
    the staging evidence.
-7. Confirm production health and smoke-test output in the workflow log.
+8. Confirm production health and smoke-test output in the workflow log.
 
 The production workflow checks the GitHub deployment history for the exact
-`GITHUB_SHA`. A new merge commit on `main` will not satisfy the gate unless that
-new SHA has also been deployed successfully to staging.
+`GITHUB_SHA`. That means the PR merge strategy matters: a merge commit, squash
+merge, or rebase that creates a new production SHA will not satisfy the gate
+unless that new SHA has also been deployed successfully to staging. For the
+current gate, use a merge strategy that preserves the staged commit as the
+production branch tip, or deploy the resulting production candidate SHA to
+staging before approving production.
 
 ## 5. Product acceptance checklist
 
@@ -219,8 +226,8 @@ After runner and environments are configured:
 git push origin HEAD:stg
 ```
 
-Watch `Deploy Staging`. If it succeeds, promote the same SHA to `main` using a
-fast-forward or equivalent no-new-SHA workflow.
+Watch `Deploy Staging`. If it succeeds, open a pull request from `stg` to the
+production branch. Do not direct-push to `main` or `master`.
 
 If production is expected to deploy through a merge commit, deploy that merge
 commit to staging first.
@@ -231,7 +238,7 @@ commit to staging first.
 | --- | --- | --- |
 | `Deploy Staging` stays queued | No online runner with label `fuma-lab` | Start the runner service and confirm labels in GitHub. |
 | `https://stg.t3s7.com` does not open after deploy | Host tunnel is down or public hostname points to the wrong service | Check `systemctl status cloudflared --no-pager` and confirm Cloudflare routes `stg.t3s7.com` to `http://127.0.0.1:3001`. |
-| Production fails at `require-staging` | Current SHA was not deployed successfully to staging | Promote the exact staged SHA or deploy the production candidate SHA to staging first. |
+| Production fails at `require-staging` | Current SHA was not deployed successfully to staging | Open a PR that preserves the exact staged SHA as the production branch tip, or deploy the production candidate SHA to staging first. |
 | Production waits for approval | Required reviewers are enabled | Product/release owner approves after staging acceptance. |
 | Deploy job cannot reach Docker | Runner user lacks Docker access | Fix host permissions and rerun the job. |
 | Production rejects config | `PRODUCTION_SITE_URL` missing or placeholder, or `ROBOTS_NOINDEX=1` | Correct the production Environment variables. |

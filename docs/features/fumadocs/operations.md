@@ -178,9 +178,10 @@ Docker 和 Compose。
 
 production workflow 的 staging gate 使用 GitHub Deployments API 检查当前
 `GITHUB_SHA` 是否已经在 `staging` 环境成功部署。因此生产晋级应推广同一个
-已经通过 staging 的提交 SHA。若使用 merge commit 产生新的 SHA，gate 会拒绝
-部署；推荐从 `stg` 快进/合并到 `main` 时保持待发布提交本身不变，或先让新的
-生产候选 SHA 经过 staging。
+已经通过 staging 的提交 SHA。生产分支更新必须通过 PR；agent 只执行到
+`stg` 部署和验证为止，不直接 push `main` 或 `master`。若 PR 合并策略产生新的
+SHA，gate 会拒绝部署；应保持 staged commit 成为生产分支 tip，或先让新的生产
+候选 SHA 经过 staging。
 
 GitHub Environments / Variables / Secrets：
 
@@ -198,6 +199,8 @@ GitHub Environments / Variables / Secrets：
 GitHub Environment deployment branch policies 当前限制为：`staging` 只允许
 `stg` 分支部署，`production` 只允许 `main` 分支部署。`production` 还配置了
 required reviewer `saberu-ops`，用于在自动检查通过后保留一次人为发布确认。
+这些 Environment policy 只限制部署目标，不等同于 branch protection；仍需用
+GitHub branch protection 或 repository ruleset 阻止直接 push 生产分支。
 
 建议在 GitHub Environment `production` 上启用 required reviewers，把产品验收
 作为生产部署前的人为 gate。自动检查能确认服务可运行，不能替代“是否应该上线”
